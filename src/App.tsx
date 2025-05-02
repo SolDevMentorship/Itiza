@@ -6,13 +6,15 @@ import GiftToken from "./pages/GiftToken";
 import Categories from "./pages/Categories";
 import WalletContextProvider from "./components/walletConnect";
 import { Layout } from "./components/Layout";
+import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 
 function App() {
   return (
     <WalletContextProvider>
       <Router>
-        <Routes>
+              <Routes>
+                  <Route path="/test" element={<Landing />} />
           <Route path="/" element={<Home />} />
           <Route
             path="/dashboard"
