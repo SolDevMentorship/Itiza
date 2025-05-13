@@ -17,7 +17,12 @@ export const Header: React.FC<HeaderProps> = ({ hasPendingGift, onOpenUnwrapModa
 
   return (
       <header className="container mx-auto p-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
+          <div
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => navigate('/')}
+              role="button"
+              aria-label="Go to home page"
+          >
               <Gift className="h-8 w-8 text-pink-600" />
               <h1 className="text-2xl font-bold text-pink-800">Itiza</h1>
           </div>

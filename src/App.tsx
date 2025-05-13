@@ -16,9 +16,9 @@ function App() {
       <Router>
         <Routes>
             <Route path="/" element={<Landing />} />
-                  <Route path="/new" element={<Layout><New /></Layout>} />
+                  <Route path="/oldDashboard" element={<Layout><Dashboard /></Layout>} />
             <Route path="/old" element={<Home />} />
-            <Route path="/dashboard" element={<Layout> <Dashboard /> </Layout>} />
+            <Route path="/dashboard" element={<Layout> <New /> </Layout>} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/gift-airtime" element={<ProtectedRoute> <GiftAirtime /> </ProtectedRoute>} />
             <Route
