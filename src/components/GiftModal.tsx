@@ -56,7 +56,7 @@ const defaultStories = {
     "Tiny treasures woven together, just like the memories we’ve created side by side...",
 };
 
-export function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
+export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
   const [selectedRelation, setSelectedRelation] = useState("");
   const [customMessage, setCustomMessage] = useState("");
   const [recipientInfo, setRecipientInfo] = useState({
