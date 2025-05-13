@@ -8,7 +8,7 @@ import WalletContextProvider from "./components/walletConnect";
 import { Layout } from "./components/Layout";
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
-import New from "./pages/NewPage";
+import OldDashboard from "./pages/OldDashboard";
 
 function App() {
   return (
@@ -16,9 +16,9 @@ function App() {
       <Router>
         <Routes>
             <Route path="/" element={<Landing />} />
-                  <Route path="/oldDashboard" element={<Layout><Dashboard /></Layout>} />
+                  <Route path="/oldDashboard" element={<Layout><OldDashboard /></Layout>} />
             <Route path="/old" element={<Home />} />
-            <Route path="/dashboard" element={<Layout> <New /> </Layout>} />
+            <Route path="/dashboard" element={<Layout> <Dashboard /> </Layout>} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/gift-airtime" element={<ProtectedRoute> <GiftAirtime /> </ProtectedRoute>} />
             <Route
