@@ -128,7 +128,7 @@ export default function LandingPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.4 }}
                             >
-                                <Link href="/">
+                                <Link href="/dashboard">
                                     <Button className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-8 py-6 rounded-full text-lg font-medium">
                                         Send Your First Gift
                                         <ArrowRight className="ml-2 h-5 w-5" />
@@ -316,25 +316,6 @@ export default function LandingPage() {
                             </Button>
                         </Link>
                     </div>
-                </div>
-            </section>
-
-            {/* How It Works */}
-            <section className="py-20 bg-pink-50">
-                <div className="container mx-auto px-4">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="text-center mb-16"
-                    >
-                        <h2 className="text-3xl md:text-4xl font-bold text-pink-800 mb-4">How It Works</h2>
-                        <p className="text-lg text-pink-600 max-w-2xl mx-auto">
-                            Sending gifts with Itiza is simple, secure, and delightful. Here's how it works.
-                        </p>
-                    </motion.div>
-
-                    <HowItWorks />
                 </div>
             </section>
 

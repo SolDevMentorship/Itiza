@@ -40,7 +40,7 @@ export default function LandingHeader() {
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center gap-8">
                         <Link
-                            href="/gifts"
+                            href="/categories"
                             className={`font-medium ${isScrolled ? "text-gray-700 hover:text-pink-600" : "text-gray-800 hover:text-pink-500"
                                 }`}
                         >

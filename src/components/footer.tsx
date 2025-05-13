@@ -71,7 +71,7 @@ export default function Footer() {
                                 </a>
                             </li>
                             <li>
-                                <a href="/gifts" className="text-gray-400 hover:text-pink-400">
+                                <a href="/categories" className="text-gray-400 hover:text-pink-400">
                                     Gifts
                                 </a>
                             </li>
@@ -117,15 +117,15 @@ export default function Footer() {
                     <div>
                         <h3 className="text-lg font-semibold mb-4">Contact</h3>
                         <ul className="space-y-2 text-gray-400">
-                            <li>Email: hello@itiza.com</li>
-                            <li>Phone: +1 (234) 567-8901</li>
-                            <li>Address: 123 Gift Street, Digital City</li>
+                            <li>Email: itiza@gmail.com</li>
+                            <li>Phone: +234 (0) 810-798-6162</li>
+                            <li>Address: Nigeria</li>
                         </ul>
                     </div>
                 </div>
 
                 <div className="border-t border-gray-800 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
-                    <p className="text-gray-500 text-sm">© 2023 Itiza. All rights reserved.</p>
+                    <p className="text-gray-500 text-sm">© 2025 Itiza. All rights reserved.</p>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         <a href="#" className="text-gray-500 hover:text-pink-400 text-sm">
                             Privacy Policy

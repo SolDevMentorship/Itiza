@@ -14,8 +14,8 @@ function App() {
     <WalletContextProvider>
       <Router>
               <Routes>
-                  <Route path="/test" element={<Landing />} />
-          <Route path="/" element={<Home />} />
+                  <Route path="/" element={<Landing />} />
+          <Route path="/old" element={<Home />} />
           <Route
             path="/dashboard"
             element={

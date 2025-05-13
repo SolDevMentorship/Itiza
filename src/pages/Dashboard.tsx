@@ -96,14 +96,9 @@ export default function Dashboard() {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-[#832c2c]/90">
-                Your Balance
+                Loyalty Points
               </h2>
               <AnimatedPoints points={loyaltyPoints} animate={animatePoints} />
-            </div>
-            <div className="bg-gradient-to-r from-[#f6c1c1] to-[#fbe9e7] rounded-2xl p-8 text-center shadow-lg">
-              <span className="text-4xl md:text-5xl font-bold text-[#832c2c]">
-                $1,300
-              </span>
             </div>
           </div>
 
