@@ -226,11 +226,6 @@ export default function LandingPage() {
                                     <p className="text-lg md:text-xl text-gray-600 mb-6 pt-6">{testimonial.quote}</p>
                                     <div className="flex items-center">
                                         <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                                            <img
-                                                src={testimonial.avatar || "/placeholder.svg"}
-                                                alt={testimonial.name}
-                                                className="w-full h-full object-cover"
-                                            />
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-pink-800">{testimonial.name}</h4>
@@ -251,70 +246,6 @@ export default function LandingPage() {
                                 />
                             ))}
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Featured Gifts */}
-            <section className="py-20 bg-white">
-                <div className="container mx-auto px-4">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="text-center mb-16"
-                    >
-                        <h2 className="text-3xl md:text-4xl font-bold text-pink-800 mb-4">Featured Gifts</h2>
-                        <p className="text-lg text-pink-600 max-w-2xl mx-auto">
-                            Explore our selection of gifts perfect for any occasion and recipient.
-                        </p>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-                        {featuredGifts.map((gift, index) => (
-                            <motion.div
-                                key={gift.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-                            >
-                                <div className="relative">
-                                    <img src={gift.image || "/placeholder.svg"} alt={gift.title} className="w-full h-48 object-cover" />
-                                    {!gift.available && (
-                                        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
-                                            <span className="bg-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                                Coming Soon
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="p-5">
-                                    <h3 className="text-lg font-bold text-pink-800 mb-2">{gift.title}</h3>
-                                    <p className="text-gray-600 text-sm mb-4">{gift.description}</p>
-                                    {gift.available ? (
-                                        <Link href="/">
-                                            <Button variant="outline" className="w-full border-pink-500 text-pink-500 hover:bg-pink-50">
-                                                Send Now
-                                            </Button>
-                                        </Link>
-                                    ) : (
-                                        <Button variant="outline" className="w-full border-gray-300 text-gray-400" disabled>
-                                            Coming Soon
-                                        </Button>
-                                    )}
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-
-                    <div className="text-center mt-12">
-                        <Link href="/gifts">
-                            <Button variant="link" className="text-pink-600 font-medium text-lg group">
-                                View All Gifts
-                                <ChevronRight className="ml-1 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                            </Button>
-                        </Link>
                     </div>
                 </div>
             </section>
@@ -343,7 +274,7 @@ export default function LandingPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
                     >
-                        <Link href="/">
+                        <Link href="/dashboard">
                             <Button className="bg-white text-pink-600 hover:bg-pink-50 px-8 py-6 rounded-full text-lg font-medium">
                                 Get Started Now
                                 <ArrowRight className="ml-2 h-5 w-5" />
