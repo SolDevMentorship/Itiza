@@ -70,7 +70,7 @@ export async function redeemGift(params: RedeemGiftParams): Promise<GiftResult> 
   return gift
 }
 
-export async function getPendingGifts(address: string): Promise<GiftResult[]> {
+export async function getPendingGifts(): Promise<GiftResult[]> {
   // Simulate API call delay
   await new Promise((resolve) => setTimeout(resolve, 500))
 

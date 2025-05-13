@@ -13,7 +13,6 @@ import { Hearts } from "@/components/hearts"
 import { Clouds } from "@/components/clouds"
 import { Header } from "@/components/Header"
 import { useNavigate } from "react-router-dom";
-import LandingHeader from "@/components/landing-header";
 import { AnimatedPoints } from "@/components/ui/point";
 import {
     pendant,
@@ -72,7 +71,7 @@ export default function Dashboard() {
     const [isTokenModalOpen, setIsTokenModalOpen] = useState(false)
     const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
     const [hasPendingGift, setHasPendingGift] = useState(false)
-    const { address, isConnected, connect } = useWallet()
+    const { isConnected } = useWallet()
     const navigate = useNavigate();
 
     const [loyaltyPoints, _setLoyaltyPoints] = useState(0);

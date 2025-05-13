@@ -6,8 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Hearts } from "@/components/hearts"
 import { Clouds } from "@/components/clouds"
-import { Gift, Heart, Shield, Clock, ChevronRight, ArrowRight } from "lucide-react"
-import HowItWorks from "@/components/how-it-works"
+import { Gift, Heart, Shield, Clock, ArrowRight } from "lucide-react"
 import LandingHeader from "@/components/landing-header"
 import Footer from "@/components/footer"
 
@@ -38,37 +37,6 @@ export default function LandingPage() {
             name: "David L.",
             role: "Gift Recipient",
             avatar: "/placeholder.svg?height=60&width=60",
-        },
-    ]
-
-    const featuredGifts = [
-        {
-            id: 1,
-            title: "Airtime Gift",
-            description: "Send mobile airtime to anyone with just their phone number",
-            image: "/placeholder.svg?height=200&width=200",
-            available: true,
-        },
-        {
-            id: 2,
-            title: "Teddy Bear",
-            description: "Soft and cuddly teddy bear for your loved one",
-            image: "/placeholder.svg?height=200&width=200",
-            available: false,
-        },
-        {
-            id: 3,
-            title: "Gift Card",
-            description: "Digital gift cards for popular online stores",
-            image: "/placeholder.svg?height=200&width=200",
-            available: false,
-        },
-        {
-            id: 4,
-            title: "Crypto Token",
-            description: "Send cryptocurrency tokens as gifts",
-            image: "/placeholder.svg?height=200&width=200",
-            available: false,
         },
     ]
 

@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
 import { Loader2 } from "lucide-react"
 import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { PublicKey } from "@solana/web3.js"
@@ -21,7 +20,6 @@ interface GiftTokenModalProps {
 export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps) {
     const { connection } = useConnection()
     const wallet = useWallet()
-    const { toast } = useToast()
 
     const [giftAddress, setGiftAddress] = useState("")
     const [giftAmount, setGiftAmount] = useState("")

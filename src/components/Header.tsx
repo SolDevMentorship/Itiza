@@ -2,9 +2,8 @@
 
 import { Gift, Bell } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CustomWalletMultiButton } from "./walletConnect";
-import { GiftNotifications } from "./GiftNotification";
 
 interface HeaderProps {
     hasPendingGift: boolean
@@ -13,7 +12,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ hasPendingGift, onOpenUnwrapModal }) => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   return (
       <header className="container mx-auto p-4 flex justify-between items-center">

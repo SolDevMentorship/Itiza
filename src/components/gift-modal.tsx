@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
 import { Loader2 } from "lucide-react"
 import { TokenAddress, TOKEN_LIST } from "@/config/tokens"
 import { FrampRelayer } from "framp-relay-sdk"
@@ -23,7 +22,6 @@ interface GiftModalProps {
 export default function GiftModal({ isOpen, onClose }: GiftModalProps) {
     const { connection } = useConnection()
     const wallet = useWallet()
-    const { toast } = useToast()
 
     const [phoneNumber, setPhoneNumber] = useState("")
     const [amount, setAmount] = useState("")

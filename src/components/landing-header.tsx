@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Gift, Menu, X } from "lucide-react"
-import WalletConnect from "@/components/walletConnect"
+import WalletConnect from "@/components/wallet-connect"
 
 export default function LandingHeader() {
     const [isScrolled, setIsScrolled] = useState(false)

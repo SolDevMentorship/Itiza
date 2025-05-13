@@ -58,7 +58,6 @@ export const invokeGiftToken = async (
         walletPublicKey: wallet.publicKey,
         recipient: recipientATA.address.toBase58(),
         amount: giftAmount,
-        tokenMint,
       });
 
       console.log("Transaction created:", transaction);

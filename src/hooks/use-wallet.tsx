@@ -79,7 +79,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const signMessage = async (message: string): Promise<string> => {
+  const signMessage = async (): Promise<string> => {
     try {
       // This is a mock implementation
       // In a real app, you would use the wallet's signing functionality

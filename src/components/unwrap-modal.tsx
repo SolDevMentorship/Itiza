@@ -10,8 +10,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2, CheckCircle2 } from "lucide-react"
-import { redeemGift } from "@/lib/gift-service"
-import { useWallet } from "@/hooks/use-wallet"
 import UnwrapAnimation from "./unwrap-animation"
 
 interface UnwrapModalProps {
@@ -25,7 +23,7 @@ export default function UnwrapModal({ isOpen, onClose }: UnwrapModalProps) {
   const [isUnwrapping, setIsUnwrapping] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [giftDetails, setGiftDetails] = useState<{ amount: number; phoneNumber: string } | null>(null)
-  const { isConnected, address } = useWallet()
+  //const { isConnected, address } = useWallet()
   const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -25,7 +25,7 @@ const relationships = [
   "Mentor",
 ];
 
-const defaultStories = {
+const defaultStories: Record<string, string> = {
   "Wine Bottle":
     "Toast to our beautiful moments together, each sip a memory cherished...",
   "Teddy Bear":
