@@ -8,7 +8,7 @@ export function Clouds() {
             key={i}
             className="absolute bg-white/80 rounded-full blur-md"
             style={{
-              width: `${100 + Math.random() * 100}px`,
+              width: `${10 + Math.random() * 100}px`,
               height: `${3 + Math.random() * 60}px`,
               left: `${i * 25 - 10}%`,
               top: `${Math.random() * 20}%`,

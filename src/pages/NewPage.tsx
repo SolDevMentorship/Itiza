@@ -22,7 +22,6 @@ import {
     wristwatch,
     winebottle,
     velvetbox,
-    // perfume,
 } from "@/images";
 
 import { GiftModalOld } from "@/components/GiftModal";
@@ -64,13 +63,7 @@ const items = [
         name: "Ring Pack",
         img: velvetbox,
         price: "1200",
-    },
-    // {
-    //   id: 7,
-    //   name: "Idol Perfume",
-    //   img: perfume,
-    //   price: "230",
-    // },
+    }
 ];
 export default function Home() {
     const [selectedItem, setSelectedItem] = useState(null);
@@ -112,7 +105,7 @@ export default function Home() {
     };
 
     return (
-        <div className="container mx-auto pb-8 pt-20 bg-gradient-to-b">
+        <div className="container mx-auto pb-8 bg-gradient-to-b">
             <Hearts />
             <Clouds />
             <Header hasPendingGift={hasPendingGift} onOpenUnwrapModal={handleOpenUnwrapModal} />

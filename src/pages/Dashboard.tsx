@@ -13,7 +13,7 @@ import {
 } from "@/images";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { GiftModal } from "@/components/GiftModal";
+import { GiftModalOld } from "@/components/GiftModal";
 
 const items = [
   {
@@ -152,7 +152,7 @@ export default function Dashboard() {
         </div>
         {/* Modal.. */}
         {selectedItem && (
-          <GiftModal
+          <GiftModalOld
             item={selectedItem}
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
