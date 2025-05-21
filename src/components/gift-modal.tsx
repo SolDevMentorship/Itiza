@@ -80,6 +80,8 @@ export default function GiftModal({ isOpen, onClose }: GiftModalProps) {
                 userAddress: wallet.publicKey.toString()
             })
 
+            console.log("API result:", result);
+
             const latestBlockhash = await connection.getLatestBlockhash("confirmed")
 
             if (result.swapTransaction && result.airtimeTransaction) {

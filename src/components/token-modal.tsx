@@ -1,7 +1,13 @@
 ﻿"use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,8 +15,7 @@ import { Loader2 } from "lucide-react"
 import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { PublicKey } from "@solana/web3.js"
 import { invokeGiftToken } from "@/utils/helpers"
-
-type TokenSymbol = "SOL" | "USDC" | "USDT"
+import { TokenListProvider, TokenInfo } from "@solana/spl-token-registry"
 
 interface GiftTokenModalProps {
     isOpen: boolean
@@ -23,26 +28,60 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
 
     const [giftAddress, setGiftAddress] = useState("")
     const [giftAmount, setGiftAmount] = useState("")
-    const [selectedToken, setSelectedToken] = useState<TokenSymbol>("SOL")
+    const [selectedToken, setSelectedToken] = useState("SOL")
     const [isProcessing, setIsProcessing] = useState(false)
     const [message, setMessage] = useState("")
     const [userBalance, setUserBalance] = useState(0)
+    const [tokenAccounts, setTokenAccounts] = useState<any[]>([])
+    const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map())
     const feeRate = 0.05 // 5% fee
 
     useEffect(() => {
-        const fetchUserBalance = async () => {
-            if (wallet.publicKey) {
-                const balance = await getSolBalance(wallet.publicKey)
-                setUserBalance(balance)
+        new TokenListProvider().resolve().then((tokens) => {
+            const tokenList = tokens.filterByChainId(101).getList()
+            const map = new Map(tokenList.map((t) => [t.address, t]))
+            setTokenMap(map)
+        })
+    }, [])
+
+    useEffect(() => {
+        const fetchUserTokens = async () => {
+            if (!wallet.publicKey) return
+
+            // Fetch SOL balance
+            const solBalance = await connection.getBalance(wallet.publicKey)
+            setUserBalance(solBalance / 1e9)
+
+            // Fetch SPL tokens
+            const accounts = await connection.getParsedTokenAccountsByOwner(wallet.publicKey, {
+                programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+            })
+
+            const filtered = accounts.value
+                .map((acc) => acc.account.data.parsed.info)
+                .filter((info) => parseFloat(info.tokenAmount.uiAmountString) > 0)
+
+            setTokenAccounts(filtered)
+        }
+
+        fetchUserTokens()
+    }, [wallet.publicKey])
+
+    useEffect(() => {
+        const updateBalance = () => {
+            if (selectedToken === "SOL") {
+                // already set
+                return
+            }
+
+            const token = tokenAccounts.find((t) => t.mint === selectedToken)
+            if (token) {
+                setUserBalance(parseFloat(token.tokenAmount.uiAmountString))
             }
         }
-        fetchUserBalance()
-    }, [wallet.publicKey, selectedToken])
 
-    const getSolBalance = async (publicKey: PublicKey) => {
-        const lamports = await connection.getBalance(publicKey)
-        return lamports / 1e9
-    }
+        updateBalance()
+    }, [selectedToken, tokenAccounts])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -76,7 +115,7 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
             )
 
             if (transferSuccessful) {
-                setUserBalance(prev => prev - amount)
+                setUserBalance((prev) => prev - amount)
                 setMessage("Transfer completed. Tokens sent successfully! 🎉")
                 setGiftAmount("")
                 setGiftAddress("")
@@ -114,11 +153,13 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                    {/* Balance Display */}
                     <div className="p-4 bg-gradient-to-r from-[#f6c1c1] to-[#fbe9e7] rounded-2xl text-center">
                         <h2 className="text-[#832c2c]/90 font-medium mb-2">Your Balance</h2>
                         <span className="text-2xl font-bold text-[#832c2c]">
-                            {userBalance.toFixed(4)} {selectedToken}
+                            {userBalance.toFixed(4)}{" "}
+                            {selectedToken === "SOL"
+                                ? "SOL"
+                                : tokenMap.get(selectedToken)?.symbol || selectedToken.slice(0, 4)}
                         </span>
                     </div>
 
@@ -147,12 +188,21 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
                         <Label>Token Type</Label>
                         <select
                             value={selectedToken}
-                            onChange={(e) => setSelectedToken(e.target.value as TokenSymbol)}
-                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            onChange={(e) => setSelectedToken(e.target.value)}
+                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"
                         >
                             <option value="SOL">Solana (SOL)</option>
-                            <option value="USDC">USDC</option>
-                            <option value="USDT">USDT</option>
+                            {tokenAccounts.map((token, idx) => {
+                                const tokenInfo = tokenMap.get(token.mint)
+                                const label = tokenInfo
+                                    ? `${tokenInfo.symbol}`
+                                    : `${token.mint.slice(0, 4)}...`
+                                return (
+                                    <option key={idx} value={token.mint}>
+                                        {label}
+                                    </option>
+                                )
+                            })}
                         </select>
                     </div>
 
@@ -164,7 +214,10 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
                     )}
 
                     {message && (
-                        <div className={`text-center ${message.includes("successfully") ? "text-green-600" : "text-red-500"}`}>
+                        <div
+                            className={`text-center ${message.includes("successfully") ? "text-green-600" : "text-red-500"
+                                }`}
+                        >
                             {message}
                         </div>
                     )}
