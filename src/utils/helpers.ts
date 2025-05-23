@@ -15,8 +15,8 @@ export const invokeGiftToken = async (
     wallet: WalletContextState,
     giftAmount: number, // e.g., 1.00 USDC (human-readable)
     recipientAddress: string, // Base58 string
+    mintToPayWith: PublicKey = SOL_MINT, // Fee token (default: SOL)
     tokenMint: PublicKey, // Token to gift
-    mintToPayWith: PublicKey = SOL_MINT // Fee token (default: SOL)
 ): Promise<boolean> => {
     try {
         if (!wallet.publicKey || !wallet.signTransaction) {
@@ -48,8 +48,8 @@ export const invokeGiftToken = async (
             walletPublicKey: wallet.publicKey, // Must be Base58 string
             recipient: recipientATA.toBase58(), // Recipient token account
             amount: amountInSmallestUnit, // Converted to smallest unit
-            tokenMintToGift: tokenMint.toBase58(), // Must be Base58 string
             mintToPayWith: mintToPayWith.toBase58(), // Must be Base58 string
+            tokenMintToGift: tokenMint.toBase58(), // Must be Base58 string   
         })
 
         if (!transaction) {
