@@ -136,7 +136,7 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
             <DialogContent className="sm:max-w-md bg-pink-50">
                 <DialogHeader>
                     <DialogTitle className="text-center text-2xl font-bold text-pink-800">
-                        Send SOL Gift
+                        Send Token Gift
                     </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
