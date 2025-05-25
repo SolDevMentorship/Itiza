@@ -63,7 +63,6 @@ export default function LandingHeader() {
                     </nav>
 
                     <div className="hidden md:flex items-center gap-4">
-                        <WalletConnect />
                         <Link href="/">
                             <Button
                                 className={`${isScrolled

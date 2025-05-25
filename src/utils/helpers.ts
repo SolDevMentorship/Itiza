@@ -1,6 +1,6 @@
 ﻿// utils/helpers.ts
 import { WalletContextState } from "@solana/wallet-adapter-react"
-import { Connection, PublicKey, Transaction, Signer } from "@solana/web3.js"
+import { Connection, PublicKey, Transaction } from "@solana/web3.js"
 import { FrampRelayer } from "framp-relay-sdk"
 import {
     getAssociatedTokenAddress,
@@ -13,14 +13,14 @@ const AIRBILLS_SECRET_KEY = import.meta.env.VITE_PUBLIC_AIRBILLS_SECRET_KEY
 const SOLSCAN_API_KEY = import.meta.env.VITE_PUBLIC_SOLSCAN_API_KEY
 
 // 🟡 SOL mint address (fixed for fees)
-const SOL_MINT = new PublicKey("So11111111111111111111111111111111111111112")
+//const SOL_MINT = new PublicKey("So11111111111111111111111111111111111111112")
 
 export const invokeGiftToken = async (
     connection: Connection,
     wallet: WalletContextState,
     giftAmount: number, // e.g., 1.00 USDC (human-readable)
     recipientAddress: string, // Base58 string
-    mintToPayWith: PublicKey = SOL_MINT,
+    mintToPayWith: PublicKey,
     tokenMint: PublicKey, // Token to gift
 ): Promise<boolean> => {
     try {
