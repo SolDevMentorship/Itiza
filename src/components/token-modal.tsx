@@ -1,5 +1,6 @@
-﻿"use client"
+﻿// Updates the token selector to a searchable input dropdown
 
+"use client"
 import { useState, useEffect } from "react"
 import {
     Dialog,
@@ -15,80 +16,55 @@ import { Loader2 } from "lucide-react"
 import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { PublicKey } from "@solana/web3.js"
 import { invokeGiftToken } from "@/utils/helpers"
-import { TokenListProvider } from "@solana/spl-token-registry"
+import tokenList from "@/utils/tokens.json"
 
 interface GiftTokenModalProps {
     isOpen: boolean
     onClose: () => void
 }
 
-// 🟡 SOL mint address
-const SOL_MINT = "So11111111111111111111111111111111111111112";
+const SOL_MINT = "So11111111111111111111111111111111111111112"
 
 export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps) {
     const { connection } = useConnection()
     const wallet = useWallet()
 
     const [giftAddress, setGiftAddress] = useState("")
-    const [giftAmount, setGiftAmount] = useState("")
+    const [solAmount, setSolAmount] = useState("")
     const [selectedTokenMint, setSelectedTokenMint] = useState<string | null>(null)
     const [isProcessing, setIsProcessing] = useState(false)
     const [message, setMessage] = useState("")
-    const [tokenAccounts, setTokenAccounts] = useState<Array<{ mint: string, amount: number, symbol: string }>>([])
     const [solBalance, setSolBalance] = useState<number>(0)
-    const feeRate = 0.05 // 5% fee
-    const estimatedFeeInSol = 0.001 // Fixed fee in SOL (adjust based on relayer docs)
+    const [tokenQuery, setTokenQuery] = useState("")
 
-    // 🟢 Fetch user's token balances and SOL balance
+    const estimatedFeeInSol = 0.001 // Fixed transaction fee
+
     useEffect(() => {
-        const fetchUserTokens = async () => {
+        const fetchBalance = async () => {
             if (!wallet.publicKey) return
 
             try {
-                // Fetch SOL balance
-                const solBalance = await connection.getBalance(wallet.publicKey)
-                setSolBalance(solBalance / 1e9)
+                const balance = await connection.getBalance(wallet.publicKey)
+                setSolBalance(balance / 1e9)
 
-                // Fetch SPL token balances
-                const accounts = await connection.getParsedTokenAccountsByOwner(wallet.publicKey, {
-                    programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
-                })
-
-                const filtered = accounts.value
-                    .map((acc) => {
-                        const parsed = acc.account.data.parsed.info
-                        const tokenMint = parsed.mint
-                        const tokenAmount = parseFloat(parsed.tokenAmount.uiAmountString)
-                        const symbol = tokenMint.slice(0, 3).toUpperCase()
-
-                        if (tokenAmount > 0) {
-                            return {
-                                mint: tokenMint,
-                                amount: tokenAmount,
-                                symbol
-                            }
-                        }
-                        return null
-                    })
-                    .filter(Boolean) as Array<{ mint: string, amount: number, symbol: string }>
-
-                setTokenAccounts(filtered)
-
-                if (filtered.length > 0 && !selectedTokenMint) {
-                    setSelectedTokenMint(filtered[0].mint)
+                if (!selectedTokenMint) {
+                    setSelectedTokenMint(tokenList[0].mint)
                 }
             } catch (error) {
-                console.error("Failed to fetch token accounts:", error)
-                setMessage("Error loading token balances")
+                console.error("Error fetching SOL balance:", error)
+                setMessage("Failed to fetch balance")
             }
         }
 
-        fetchUserTokens()
+        fetchBalance()
     }, [wallet.publicKey])
 
-    // 🟢 Update balance based on selected token
-    const selectedToken = tokenAccounts.find(t => t.mint === selectedTokenMint)
-    const userBalance = selectedToken?.amount || 0
+    const selectedToken = tokenList.find(t => t.mint === selectedTokenMint)
+    const tokenSymbol = selectedToken?.symbol || "Token"
+
+    const filteredTokens = tokenList.filter(token =>
+        token.symbol.toLowerCase().includes(tokenQuery.toLowerCase())
+    )
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -99,19 +75,14 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
             return
         }
 
-        if (tokenAccounts.length === 0) {
-            setMessage("You have no tokens to gift")
-            return
-        }
-
         if (!selectedTokenMint) {
             setMessage("No token selected for gifting")
             return
         }
 
-        const amount = parseFloat(giftAmount)
+        const amount = parseFloat(solAmount)
         if (isNaN(amount) || amount <= 0) {
-            setMessage("Please enter a valid amount")
+            setMessage("Please enter a valid SOL amount")
             return
         }
 
@@ -120,41 +91,32 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
             return
         }
 
-        // Validate SOL balance for fee
-        if (solBalance < estimatedFeeInSol) {
-            setMessage(`Insufficient SOL for transaction fees (need at least ${estimatedFeeInSol} SOL)`)
+        if (solBalance < amount + estimatedFeeInSol) {
+            setMessage(`Insufficient SOL. Need ${amount + estimatedFeeInSol} SOL (includes ${estimatedFeeInSol} SOL fee)`)
             return
         }
 
         setIsProcessing(true)
-
         try {
             const transferSuccessful = await invokeGiftToken(
                 connection,
                 wallet,
                 amount,
                 giftAddress,
-                new PublicKey(SOL_MINT), // Pass SOL as mintToPayWith
-                new PublicKey(selectedTokenMint),
+                new PublicKey(SOL_MINT),
+                new PublicKey(selectedTokenMint)
             )
 
             if (transferSuccessful) {
-                setMessage("Transfer completed. Tokens sent successfully! 🎉")
-                setGiftAmount("")
+                setMessage("Transfer initiated successfully! 🎉")
+                setSolAmount("")
                 setGiftAddress("")
-                // Refresh balances
-                const newAccounts = [...tokenAccounts]
-                const index = newAccounts.findIndex(t => t.mint === selectedTokenMint)
-                if (index >= 0) {
-                    newAccounts[index].amount -= amount
-                    setTokenAccounts(newAccounts)
-                }
             } else {
-                setMessage("Error: Failed to send tokens.")
+                setMessage("Error: Failed to process transfer.")
             }
         } catch (error) {
             console.error("Transfer error:", error)
-            setMessage("Transfer error: Failed to send tokens.")
+            setMessage("Transfer error: Failed to process transaction.")
         } finally {
             setIsProcessing(false)
         }
@@ -163,32 +125,27 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
     const handleClose = () => {
         if (!isProcessing) {
             setGiftAddress("")
-            setGiftAmount("")
+            setSolAmount("")
             setMessage("")
             onClose()
         }
     }
-
-    const calculatedFee = parseFloat(giftAmount) * feeRate || 0
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
             <DialogContent className="sm:max-w-md bg-pink-50">
                 <DialogHeader>
                     <DialogTitle className="text-center text-2xl font-bold text-pink-800">
-                        Send Token Gift
+                        Send SOL Gift
                     </DialogTitle>
                 </DialogHeader>
-
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                    {selectedToken && (
-                        <div className="p-4 bg-gradient-to-r from-[#f6c1c1] to-[#fbe9e7] rounded-2xl text-center">
-                            <h2 className="text-[#832c2c]/90 font-medium mb-2">Your Balance</h2>
-                            <span className="text-2xl font-bold text-[#832c2c]">
-                                {userBalance.toFixed(4)} {selectedToken.symbol}
-                            </span>
-                        </div>
-                    )}
+                    <div className="p-4 bg-gradient-to-r from-[#f6c1c1] to-[#fbe9e7] rounded-2xl text-center">
+                        <h2 className="text-[#832c2c]/90 font-medium mb-2">Your SOL Balance</h2>
+                        <span className="text-2xl font-bold text-[#832c2c]">
+                            {solBalance.toFixed(4)} SOL
+                        </span>
+                    </div>
 
                     <div className="space-y-2">
                         <Label>Recipient Address</Label>
@@ -201,45 +158,51 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Amount ({selectedToken?.symbol || "Token"})</Label>
+                        <Label>Amount (SOL)</Label>
                         <Input
                             type="number"
+                            step="any"
                             placeholder="0.00"
-                            value={giftAmount}
-                            onChange={(e) => setGiftAmount(e.target.value)}
-                            disabled={isProcessing || !tokenAccounts.length}
+                            value={solAmount}
+                            onChange={(e) => setSolAmount(e.target.value)}
+                            disabled={isProcessing}
                         />
                     </div>
 
-                    {tokenAccounts.length > 0 && (
-                        <div className="space-y-2">
-                            <Label>Token to Gift</Label>
+                    <div className="space-y-2">
+                        <Label>Search Token Symbol</Label>
+                        <Input
+                            placeholder="Start typing a token symbol..."
+                            value={tokenQuery}
+                            onChange={(e) => setTokenQuery(e.target.value)}
+                            disabled={isProcessing}
+                        />
+                        {filteredTokens.length > 0 && (
                             <select
                                 value={selectedTokenMint || ""}
                                 onChange={(e) => setSelectedTokenMint(e.target.value)}
                                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"
                             >
-                                {tokenAccounts.map((token) => (
+                                {filteredTokens.map((token) => (
                                     <option key={token.mint} value={token.mint}>
-                                        {token.symbol} ({token.amount.toFixed(4)})
+                                        {token.symbol}
                                     </option>
                                 ))}
                             </select>
-                        </div>
-                    )}
+                        )}
+                    </div>
 
-                    {giftAmount && (
-                        <div className="p-3 bg-white/50 rounded-xl text-[#832c2c]/80 text-sm space-y-1">
-                            <p>Fee: {estimatedFeeInSol} SOL (fixed)</p>
-                            <p>Recipient receives: {(parseFloat(giftAmount) - calculatedFee).toFixed(4)} {selectedToken?.symbol || "Token"}</p>
+                    {solAmount && (
+                        <div className="p-3 bg-white/50 rounded-xl text-[#832c2c]/80 text-sm">
+                            <p>Transaction Fee: {estimatedFeeInSol} SOL (fixed)</p>
+                            <p className="mt-1">
+                                Recipient will receive {tokenSymbol} based on current rates
+                            </p>
                         </div>
                     )}
 
                     {message && (
-                        <div
-                            className={`text-center ${message.includes("successfully") ? "text-green-600" : "text-red-500"
-                                }`}
-                        >
+                        <div className={`text-center ${message.includes("successfully") ? "text-green-600" : "text-red-500"}`}>
                             {message}
                         </div>
                     )}
@@ -255,7 +218,7 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
                         </Button>
                         <Button
                             type="submit"
-                            disabled={isProcessing || !wallet.connected || tokenAccounts.length === 0}
+                            disabled={isProcessing || !wallet.connected || tokenList.length === 0}
                             className="bg-pink-600 hover:bg-pink-700 text-white"
                         >
                             {isProcessing ? (
@@ -264,7 +227,7 @@ export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps)
                                     Processing...
                                 </>
                             ) : (
-                                "Send Tokens"
+                                "Send Gift"
                             )}
                         </Button>
                     </DialogFooter>
