@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Gift, Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import WalletConnect from "@/components/wallet-connect"
 
 export default function LandingHeader() {
@@ -32,10 +32,16 @@ export default function LandingHeader() {
         >
             <div className="container mx-auto px-4">
                 <div className="flex justify-between items-center">
-                    <Link href="/landing" className="flex items-center gap-2">
-                        <Gift className={`h-8 w-8 ${isScrolled ? "text-pink-600" : "text-pink-500"}`} />
-                        <h1 className={`text-2xl font-bold ${isScrolled ? "text-pink-800" : "text-pink-700"}`}>Itiza</h1>
-                    </Link>
+                    <a href="/" className="flex items-center gap-2">
+                        {/* Use Next.js Image component for the logo */}
+                        <img
+                            src="/images/ItizaLogo.png" // Path to your logo in public/images
+                            alt="Itiza Logo"
+                            width={65} // Adjust width as needed
+                            height={65} // Adjust height as needed
+                            className={`${isScrolled ? "" : ""}`} // Add any specific styling based on scroll if necessary
+                        />
+                    </a>
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center gap-8">

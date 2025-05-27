@@ -155,6 +155,36 @@ export default function Dashboard() {
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {/* New Affiliate Product Card */}
+                        <Card className="bg-gradient-to-br from-blue-600 to-purple-600 text-white w-full md:w-[320px] shadow-xl">
+                            <CardContent className="p-4 flex flex-col justify-between h-full">
+                                <div className="flex items-center justify-between gap-3 mb-4">
+                                    <div className="space-y-1">
+                                        <h3 className="text-lg font-semibold">Order your Ryder One</h3>
+                                        <p className="text-xs opacity-90">Discover something new!</p>
+                                    </div>
+                                    {/* Placeholder for Affiliate Product Image */}
+                                    <img
+                                        src="/images/RyderImage.png" // **Update this path to your actual affiliate product image**
+                                        alt="Ryder Product"
+                                        width={57} // Adjust width as needed
+                                        height={57} // Adjust height as needed
+                                        className="rounded-full object-cover" // Example styling for a circular image
+                                    />
+                                </div>
+                                <p className="text-sm mb-4">
+                                    Check out this amazing product from our trusted partner. Click to learn more!
+                                </p>
+                                <Button
+                                    variant="ghost"
+                                    className="mt-auto text-blue-100 hover:text-white hover:bg-white/10 text-sm px-3 py-2"
+                                    onClick={() => window.open("https://ryder.id/products/ryder-one", "_blank")}
+                                >
+                                    Learn More →
+                                </Button>
+                            </CardContent>
+                        </Card>
                     </div>
                 </motion.div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
