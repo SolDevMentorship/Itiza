@@ -43,7 +43,7 @@ const items = [
         id: 3,
         name: "Teddy Bear",
         img: teddybear,
-        price: "300",
+        price: "1",
     },
     {
         id: 4,
