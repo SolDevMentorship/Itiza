@@ -3,7 +3,7 @@ import type { Database } from '../types/supabase';
 
 type Tables = Database['public']['Tables'];
 type Customer = Tables['customers']['Row'];
-type Gift = Tables['gifts']['Row'];
+//type Gift = Tables['gifts']['Row'];
 type Order = Tables['orders']['Row'];
 type OrderItem = Tables['order_items']['Row'];
 
