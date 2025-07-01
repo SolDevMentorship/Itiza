@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Gift, Phone, Gem, Coins} from "lucide-react"
+import { Gift, Phone, Coins} from "lucide-react"
 import GiftModal from "@/components/gift-modal"
 import TokenModal from "@/components/token-modal"
 import UnwrapModal from "@/components/unwrap-modal"
@@ -13,7 +13,6 @@ import { Hearts } from "@/components/hearts"
 import { Clouds } from "@/components/clouds"
 import { Header } from "@/components/Header"
 import { useNavigate } from "react-router-dom";
-import { AnimatedPoints } from "@/components/ui/point";
 import {
     pendant,
     goldring,
@@ -24,7 +23,6 @@ import {
 } from "@/images";
 
 import { GiftModalOld } from "@/components/GiftModal";
-
 
 const items = [
     {
@@ -132,32 +130,8 @@ export default function Dashboard() {
                             </p>
                         </div>
 
-                        {/* Loyalty Points Card */}
-                        <Card className="bg-gradient-to-br from-purple-600 to-pink-600 text-white w-full lg:w-[320px] shadow-xl">
-                            <CardContent className="p-4">
-                                <div className="flex items-center justify-between gap-3">
-                                    <div className="space-y-1">
-                                        <h3 className="text-lg font-semibold">Loyalty Points</h3>
-                                        <p className="text-xs opacity-90">Available to redeem</p>
-                                    </div>
-                                    <Gem className="h-10 w-10 stroke-[1.5]" />
-                                </div>
-                                <div className="mt-4 text-center">
-                                    <div className="text-3xl font-bold">
-                                        <AnimatedPoints points={loyaltyPoints} animate={animatePoints} />
-                                    </div>
-                                    <Button
-                                        variant="ghost"
-                                        className="mt-3 text-pink-100 hover:text-white hover:bg-white/10 text-sm px-3 py-2"
-                                    >
-                                        Redeem →
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* New Affiliate Product Card */}
-                        <Card className="bg-gradient-to-br from-blue-600 to-purple-600 text-white w-full md:w-[320px] shadow-xl">
+                        {/* Affiliate Card */}
+                        <Card className="bg-gradient-to-br from-blue-600 to-purple-600 text-white w-full lg:w-[320px] shadow-xl">
                             <CardContent className="p-4 flex flex-col justify-between h-full">
                                 <div className="flex items-center justify-between gap-3 mb-4">
                                     <div className="space-y-1">
