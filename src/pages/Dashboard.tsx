@@ -12,94 +12,80 @@ import { motion } from "framer-motion"
 import { Hearts } from "@/components/hearts"
 import { Clouds } from "@/components/clouds"
 import { Header } from "@/components/Header"
-import { useNavigate } from "react-router-dom";
-import {
-    pendant,
-    goldring,
-    teddybear,
-    wristwatch,
-    winebottle,
-    velvetbox,
-} from "@/images";
+import { useNavigate } from "react-router-dom"
+import { DatabaseService } from "@/lib/database"
+import { GiftModalOld } from "@/components/GiftModal"
+import type { Database } from "@/types/supabase"
+type GiftType = Database["public"]["Tables"]["gifts"]["Row"]
 
-import { GiftModalOld }  from "@/components/GiftModal";
-
-const items = [
-    {
-        id: 1,
-        name: "Gold Pendant",
-        img: pendant,
-        price: "500",
-    },
-    {
-        id: 2,
-        name: "Gold Ring",
-        img: goldring,
-        price: "450",
-    },
-    {
-        id: 3,
-        name: "Teddy Bear",
-        img: teddybear,
-        price: "1",
-    },
-    {
-        id: 4,
-        name: "Wristwatch",
-        img: wristwatch,
-        price: "750",
-    },
-    {
-        id: 5,
-        name: "Wine Bottle",
-        img: winebottle,
-        price: "600",
-    },
-    {
-        id: 6,
-        name: "Ring Pack",
-        img: velvetbox,
-        price: "1200",
-    }
-];
 export default function Dashboard() {
-    const [selectedItem, setSelectedItem] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<GiftType | null>(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
     const [isGiftModalOpen, setIsGiftModalOpen] = useState(false)
     const [isTokenModalOpen, setIsTokenModalOpen] = useState(false)
     const [isUnwrapModalOpen, setIsUnwrapModalOpen] = useState(false)
     const [hasPendingGift, setHasPendingGift] = useState(false)
-    const { isConnected } = useWallet()
-    const navigate = useNavigate();
+    const [featuredGifts, setFeaturedGifts] = useState<GiftType[]>([])
+    const { isConnected, address } = useWallet()
+    const navigate = useNavigate()
 
-    const [loyaltyPoints, _setLoyaltyPoints] = useState(0);
-    const [animatePoints, _setAnimatePoints] = useState(false);
+    useEffect(() => {
+        const loadFeaturedGifts = async () => {
+            try {
+                const gifts = await DatabaseService.getAllGifts()
+                setFeaturedGifts(gifts)
+            } catch (error) {
+                console.error('Error loading gifts:', error)
+            }
+        }
 
-  // Check for pending gifts (this would connect to your backend in production)
-  useEffect(() => {
-    // Simulate checking for pending gifts
-    const checkPendingGifts = async () => {
-      if (isConnected) {
-        // This would be an API call in production
-        const hasPending = Math.random() > 0.5
-        setHasPendingGift(hasPending)
-      }
-    }
+        loadFeaturedGifts()
+    }, [])
 
-    checkPendingGifts()
-    // Set up interval to check periodically
-    const interval = setInterval(checkPendingGifts, 30000)
-    return () => clearInterval(interval)
-  }, [isConnected])
+    useEffect(() => {
+        const checkPendingGifts = async () => {
+            if (isConnected && address) {
+                try {
+                    // Create customer if they don't exist
+                    const customer = await DatabaseService.getCustomerByWallet(address)
+                    if (!customer) {
+                        await DatabaseService.createCustomer({
+                            name: `Anonymous-${address.slice(0, 6)}`,
+                            email: null,
+                            wallet_address: address,
+                            blockchain_network: null,
+                            phone: null,
+                            street: null,
+                            city: null,
+                            state: null,
+                            zip: null,
+                            country: null
+                        })
+                    }
+
+                    // Check for pending gifts
+                    const orders = await DatabaseService.getCustomerOrders(customer?.customer_id || 0)
+                    const hasPending = orders.some(order => order.status === 'pending')
+                    setHasPendingGift(hasPending)
+                } catch (error) {
+                    console.error('Error checking gifts:', error)
+                }
+            }
+        }
+
+        checkPendingGifts()
+        const interval = setInterval(checkPendingGifts, 30000)
+        return () => clearInterval(interval)
+    }, [isConnected, address])
 
     const handleOpenUnwrapModal = () => {
         setIsUnwrapModalOpen(true)
     }
-    // handlers for points animation
-    const handleItemClick = (item: any) => {
-        setSelectedItem(item);
-        setIsModalOpen(true);
-    };
+
+    const handleItemClick = (item: GiftType) => {
+        setSelectedItem(item)
+        setIsModalOpen(true)
+    }
 
     return (
         <div className="container mx-auto pb-8 bg-gradient-to-b">
@@ -108,7 +94,6 @@ export default function Dashboard() {
             <Header hasPendingGift={hasPendingGift} onOpenUnwrapModal={handleOpenUnwrapModal} />
 
             <main className="container mx-auto px-4 py-12">
-                {/* Improved Header Section */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -116,7 +101,6 @@ export default function Dashboard() {
                     className="mb-16"
                 >
                     <div className="flex flex-col lg:flex-row items-start justify-between gap-8">
-                        {/* Main Header Content */}
                         <div className="flex-1 space-y-6">
                             <h1 className="text-5xl font-bold text-pink-900 leading-tight">
                                 Spread Joy with<br />
@@ -130,7 +114,6 @@ export default function Dashboard() {
                             </p>
                         </div>
 
-                        {/* Affiliate Card */}
                         <Card className="bg-gradient-to-br from-blue-600 to-purple-600 text-white w-full lg:w-[320px] shadow-xl">
                             <CardContent className="p-4 flex flex-col justify-between h-full">
                                 <div className="flex items-center justify-between gap-3 mb-4">
@@ -138,13 +121,12 @@ export default function Dashboard() {
                                         <h3 className="text-lg font-semibold">Order your Ryder One</h3>
                                         <p className="text-xs opacity-90">Discover something new!</p>
                                     </div>
-                                    {/* Placeholder for Affiliate Product Image */}
                                     <img
-                                        src="/images/RyderImage.png" // **Update this path to your actual affiliate product image**
+                                        src="/images/RyderImage.png"
                                         alt="Ryder Product"
-                                        width={57} // Adjust width as needed
-                                        height={57} // Adjust height as needed
-                                        className="rounded-full object-cover" // Example styling for a circular image
+                                        width={57}
+                                        height={57}
+                                        className="rounded-full object-cover"
                                     />
                                 </div>
                                 <p className="text-sm mb-4">
@@ -161,19 +143,21 @@ export default function Dashboard() {
                         </Card>
                     </div>
                 </motion.div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="p-0">
-              <div className="bg-gradient-to-r from-pink-500 to-rose-400 p-6 text-white">
-                <Phone className="h-12 w-12 mb-4" />
-                <h3 className="text-xl font-bold mb-2">Gift Airtime</h3>
-                <p className="mb-4">Send airtime to friends and family with just their phone number.</p>
-                <Button onClick={() => setIsGiftModalOpen(true)} className="bg-white text-pink-700 hover:bg-gray-100">
-                  Send Airtime
-                </Button>
-              </div>
-            </CardContent>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                        <CardContent className="p-0">
+                            <div className="bg-gradient-to-r from-pink-500 to-rose-400 p-6 text-white">
+                                <Phone className="h-12 w-12 mb-4" />
+                                <h3 className="text-xl font-bold mb-2">Gift Airtime</h3>
+                                <p className="mb-4">Send airtime to friends and family with just their phone number.</p>
+                                <Button onClick={() => setIsGiftModalOpen(true)} className="bg-white text-pink-700 hover:bg-gray-100">
+                                    Send Airtime
+                                </Button>
+                            </div>
+                        </CardContent>
                     </Card>
+
                     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
                         <CardContent className="p-0">
                             <div className="bg-gradient-to-r from-rose-400 to-red-400 p-6 text-white">
@@ -187,23 +171,21 @@ export default function Dashboard() {
                         </CardContent>
                     </Card>
 
-          <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="p-0">
-              <div className="bg-gradient-to-r from-pink-400 to-purple-400 p-6 text-white">
-                <Gift className="h-12 w-12 mb-4" />
-                <h3 className="text-xl font-bold mb-2">Redeem Gift</h3>
-                <p className="mb-4">Have a gift code? Redeem it here to unwrap your gift.</p>
-                <Button onClick={() => setIsUnwrapModalOpen(true)} className="bg-white text-pink-700 hover:bg-gray-100">
-                  Unwrap Gift
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                        <CardContent className="p-0">
+                            <div className="bg-gradient-to-r from-pink-400 to-purple-400 p-6 text-white">
+                                <Gift className="h-12 w-12 mb-4" />
+                                <h3 className="text-xl font-bold mb-2">Redeem Gift</h3>
+                                <p className="mb-4">Have a gift code? Redeem it here to unwrap your gift.</p>
+                                <Button onClick={() => setIsUnwrapModalOpen(true)} className="bg-white text-pink-700 hover:bg-gray-100">
+                                    Unwrap Gift
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
 
-                {/* Featured Items */}
                 <div>
-                    {/* Section Header */}
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-3xl font-bold text-[#832c2c]">
                             Featured Gifts
@@ -217,27 +199,26 @@ export default function Dashboard() {
                         </Button>
                     </div>
 
-                    {/* Featured Gifts Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                        {items.map((item) => (
+                        {featuredGifts.map((gift) => (
                             <Card
-                                key={item.id}
-                                onClick={() => handleItemClick(item)}
+                                key={gift.gift_id}
+                                onClick={() => handleItemClick(gift)}
                                 className="group bg-white/40 hover:bg-white/60 transition-all cursor-pointer border-0 shadow-md hover:shadow-xl rounded-lg overflow-hidden hover:-translate-y-1"
                             >
                                 <CardContent className="p-3">
                                     <div className="aspect-square mb-2 overflow-hidden rounded-md">
                                         <img
-                                            src={item.img}
-                                            alt={item.name}
+                                            src={gift.image_url || '/images/gift-placeholder.png'}
+                                            alt={gift.name}
                                             className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                                         />
                                     </div>
                                     <div className="text-center">
                                         <p className="text-[#832c2c] font-medium text-sm mb-0.5 truncate">
-                                            {item.name}
+                                            {gift.name}
                                         </p>
-                                        <p className="text-[#832c2c]/70 text-xs">${item.price}</p>
+                                        <p className="text-[#832c2c]/70 text-xs">${gift.price}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -245,18 +226,22 @@ export default function Dashboard() {
                     </div>
                 </div>
             </main>
-            {/* Modal.. */}
+
             {selectedItem && (
                 <GiftModalOld
-                    item={selectedItem}
+                    item={{
+                        ...selectedItem,
+                        price: selectedItem?.price?.toString() || '0',
+                        image_url: selectedItem?.image_url || undefined
+                    }}
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                 />
             )}
 
-          <GiftModal isOpen={isGiftModalOpen} onClose={() => setIsGiftModalOpen(false)} />
-          <TokenModal isOpen={isTokenModalOpen} onClose={() => setIsTokenModalOpen(false)} />
-      <UnwrapModal isOpen={isUnwrapModalOpen} onClose={() => setIsUnwrapModalOpen(false)} />
-    </div>
-  )
+            <GiftModal isOpen={isGiftModalOpen} onClose={() => setIsGiftModalOpen(false)} />
+            <TokenModal isOpen={isTokenModalOpen} onClose={() => setIsTokenModalOpen(false)} />
+            <UnwrapModal isOpen={isUnwrapModalOpen} onClose={() => setIsUnwrapModalOpen(false)} />
+        </div>
+    )
 }

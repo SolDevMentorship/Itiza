@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { DatabaseService } from "@/lib/database";
+interface Gift {
+  gift_id: number;
+  name: string;
+  price: string;
+  image_url?: string;
+}
 
 interface GiftModalProps {
-  item: {
-    id: string;
-    name: string;
-    img: string;
-    price: string; // in USD
-  };
+  item: Gift;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -25,13 +27,10 @@ const defaultStories: Record<string, string> = {
   "Wine Bottle": "Toast to our beautiful moments together, each sip a memory cherished...", 
   "Teddy Bear": "A soft reminder of my warm embrace, always here when you need comfort...",
   "Gold Pendant": "A symbol of our eternal connection, shining with every heartbeat we share...",
-  // ... (keep your full list here)
 };
 
 const estimatedFeeInSol = 0.001;
-// const PDA_PUBLIC_KEY = new PublicKey("AA3U3yXQxDQy5D5DpjgRZN2NdLtpLydruXpUvR8yNEda");
 const TEST_WALLET_PUBLIC_KEY = new PublicKey("98TcoasyWn7tsfo5JVpjXCy43eNfREBRerF8gUpJipSS");
-
 
 // Simulated USD to SOL conversion rate
 const USD_TO_SOL_RATE = 0.08; // Example: 1 USD = 0.08 SOL
@@ -51,7 +50,6 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
     name: "",
     phone: "",
     address: "",
-    note: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -74,7 +72,7 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
         return;
       }
 
-      const itemPriceUsd = parseFloat(item.price);
+      const itemPriceUsd = Number(item.price);
       const amountInSol = convertUsdToSol(itemPriceUsd);
       const totalAmountSol = amountInSol + estimatedFeeInSol;
       const totalAmountLamports = Math.round(totalAmountSol * LAMPORTS_PER_SOL);
@@ -87,17 +85,16 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
 
       setLoading(true);
 
+      // Process blockchain transaction
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
-          toPubkey: TEST_WALLET_PUBLIC_KEY, // Replace with actual recipient public key
+          toPubkey: TEST_WALLET_PUBLIC_KEY,
           lamports: totalAmountLamports,
         })
       );
 
       const signature = await sendTransaction(transaction, connection);
-      console.log("Transaction sent. Signature:", signature);
-
       const confirmation = await connection.confirmTransaction(signature, "confirmed");
 
       if (confirmation.value.err) {
@@ -106,44 +103,51 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
         return;
       }
 
-      console.log("Payment successful!");
+      // Create customer if they don't exist
+      const customer = await DatabaseService.getCustomerByWallet(publicKey.toString());
+      let customerId: number;
 
-      const order = {
-        id: item.id,
-        item: item.name,
-        recipientName: recipientInfo.name,
-        phone: recipientInfo.phone,
-        address: recipientInfo.address,
-        note: customMessage,
-        relation: selectedRelation,
-        txSignature: signature,
-        price: itemPriceUsd,
-        amountInSol: amountInSol,
-        networkFee: estimatedFeeInSol,
-      };
-
-      const VITE_API_URL = import.meta.env.VITE_API_URL;
-      console.log("Sending order to backend:", order);
-
-      const response = await fetch(`${VITE_API_URL}/Itiza_Delivery/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(order),
-      });
-
-      const responseBody = await response.json().catch(() => ({}));
-
-      if (response.ok) {
-        console.log("Order saved successfully.", responseBody);
+      if (!customer) {
+        const newCustomer = await DatabaseService.createCustomer({
+          name: `Anonymous-${publicKey.toString().slice(0, 6)}`,
+          wallet_address: publicKey.toString(),
+          email: null,
+          phone: null,
+          street: null,
+          city: null,
+          state: null,
+          zip: null,
+          country: null,
+          blockchain_network: "Solana",
+        });
+        customerId = newCustomer.customer_id;
       } else {
-        console.error(
-          `Error saving order to database. Status: ${response.status}`,
-          responseBody
-        );
+        customerId = customer.customer_id;
       }
 
+      // Create order
+      const order = await DatabaseService.createOrder({
+        customer_id: customerId,
+        order_date: new Date().toISOString(),
+        total_amount: itemPriceUsd,
+        status: "pending",
+        recipient_name: recipientInfo.name,
+        recipient_street: recipientInfo.address,
+        recipient_city: "", // These could be split from the address field if needed
+        recipient_state: "",
+        recipient_zip: "",
+        recipient_country: "",
+        gift_message: customMessage,
+        tracking_number: null,
+      }, [
+        {
+          gift_id: item.gift_id,
+          quantity: 1,
+          unit_price: itemPriceUsd,
+        }
+      ]);
+
+      console.log("Order created successfully:", order);
       setLoading(false);
       onClose();
     } catch (error) {
@@ -151,8 +155,6 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
       setLoading(false);
     }
   };
-
-      
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -168,7 +170,7 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
         <div className="grid md:grid-cols-2 gap-6 p-6 max-h-[90vh] overflow-y-auto">
           <div className="aspect-square rounded-xl overflow-hidden">
             <img
-              src={item.img}
+              src={item.image_url || '/images/gift-placeholder.png'}
               alt={item.name}
               className="w-full h-full object-cover"
             />
@@ -178,7 +180,7 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
             <div>
               <h3 className="font-serif text-2xl text-[#832c2c] mb-2">{item.name}</h3>
               <p className="text-[#832c2c]/70">
-                ${item.price} (~{convertUsdToSol(parseFloat(item.price)).toFixed(3)} SOL) + ~{estimatedFeeInSol} SOL network fee
+                ${item.price} (~{convertUsdToSol(Number(item.price)).toFixed(3)} SOL) + ~{estimatedFeeInSol} SOL network fee
               </p>
             </div>
 
