@@ -1,11 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 //import ProtectedRoute from "./routes/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
-import Categories from "./pages/Categories";
+import AllGifts from "./pages/AllGifts";
 import WalletContextProvider from "./components/walletConnect";
 import { Layout } from "./components/Layout";
 import Landing from "./pages/Landing";
-import Home from "./pages/Home";
 
 function App() {
   return (
@@ -13,9 +12,8 @@ function App() {
       <Router>
         <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/old" element={<Home />} />
             <Route path="/dashboard" element={<Layout> <Dashboard /> </Layout>} />
-            <Route path="/categories" element={<Categories />} />
+            <Route path="/allgifts" element={<Layout> <AllGifts /> </Layout>} />
         </Routes>
       </Router>
     </WalletContextProvider>

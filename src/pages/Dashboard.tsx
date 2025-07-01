@@ -193,7 +193,7 @@ export default function Dashboard() {
                         <Button
                             variant="link"
                             className="text-pink-600 hover:text-pink-800 text-sm font-medium"
-                            onClick={() => navigate('/categories')}
+                            onClick={() => navigate('/allgifts')}
                         >
                             View All →
                         </Button>
