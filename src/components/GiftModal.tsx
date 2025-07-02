@@ -157,7 +157,8 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex flex-col">
+      <div className="flex-1 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white/90 backdrop-blur-md w-full max-w-2xl m-4 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh]">
         <button
@@ -261,6 +262,7 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
         </div>
       </div>
     </div>
+  </div>
   );
 }
 
