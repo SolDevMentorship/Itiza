@@ -19,7 +19,7 @@ type Gift = {
   description: string;
   price: number;
   image_url: string;
-  stock: number;
+  stock_quantity: number;
 };
 
 export default function AdminGifts() {
@@ -32,7 +32,7 @@ export default function AdminGifts() {
     description: '',
     price: '',
     image_url: '',
-    stock: '',
+    stock_quantity: '',
   });
   const { toast } = useToast();
 
@@ -73,7 +73,7 @@ export default function AdminGifts() {
       description: gift.description,
       price: gift.price.toString(),
       image_url: gift.image_url,
-      stock: gift.stock.toString(),
+      stock_quantity: gift.stock_quantity.toString(),
     });
     setIsDialogOpen(true);
   };
@@ -109,7 +109,7 @@ export default function AdminGifts() {
         description: formData.description,
         price: parseFloat(formData.price),
         image_url: formData.image_url,
-        stock: parseInt(formData.stock),
+        stock_quantity: parseInt(formData.stock_quantity),
       };
 
       if (editingGift) {
@@ -149,7 +149,7 @@ export default function AdminGifts() {
         description: '',
         price: '',
         image_url: '',
-        stock: '',
+        stock_quantity: '',
       });
     } catch (error) {
       console.error('Error saving gift:', error);
@@ -192,7 +192,7 @@ export default function AdminGifts() {
                 Price
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Stock
+                Stock Quantity
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
@@ -212,7 +212,7 @@ export default function AdminGifts() {
                   ${gift.price}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {gift.stock}
+                  {gift.stock_quantity}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <Button
@@ -288,12 +288,12 @@ export default function AdminGifts() {
               />
             </div>
             <div>
-              <Label htmlFor="stock">Stock</Label>
+              <Label htmlFor="stock_quantity">Stock Quantity</Label>
               <Input
-                id="stock"
-                name="stock"
+                id="stock_quantity"
+                name="stock_quantity"
                 type="number"
-                value={formData.stock}
+                value={formData.stock_quantity}
                 onChange={handleInputChange}
                 required
               />
