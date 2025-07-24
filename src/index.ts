@@ -5,8 +5,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import ordersRouter from "./order";
-import { connectToMongo } from "./mongoClient";
 import itemsRouter from "./items";
+import { connectToMongo } from "./mongoClient";
 import authRouter from "./auth"; 
 import sendOtpRouter from "./sendOTP";
 import loginUser from "./loginUser";
@@ -24,13 +24,13 @@ app.use(cors({
 app.use(express.json());
 
 // Add request logging middleware
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   console.log(`📥 ${req.method} ${req.url} - ${new Date().toISOString()}`);
   next();
 });
 
 // Test root route
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.json({ message: "Itiza Delivery API is running!" });
 });
 
@@ -44,7 +44,7 @@ app.use("/Itiza_Delivery/users/login", loginUser);
 // ...existing code...
 
 // Route debugging - List all registered routes
-app.get("/debug/routes", (req, res) => {
+app.get("/debug/routes", (_req, res) => {
   const routes: any[] = [];
 
   app._router.stack.forEach((middleware: any) => {
