@@ -50,11 +50,7 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    console.log("Received POST /orders request");
-
     await connectToMongo();
-    console.log("Mongo connected in POST /orders");
-
     const {
       id,
       item,
@@ -67,19 +63,20 @@ router.post("/", async (req, res) => {
       price,
       amountInSol,
       networkFee,
-      senderWallet,
-      status,
+      userEmail,
     } = req.body;
 
-    console.log("Request body:", req.body);
+    if (!userEmail) {
+      return res.status(400).json({ error: "User email is required" });
+    }
 
     const db = client.db("Itiza_Delivery");
-    const orders = db.collection("web3orders");
-    const users = db.collection("web3users");
+    const orders = db.collection("orders");
+    const users = db.collection("users");
+    const items = db.collection("items");
 
-    console.log("Inserting order...");
-
-    const result = await orders.insertOne({
+    // Save the order
+    await orders.insertOne({
       id,
       item,
       recipientName,
@@ -91,50 +88,36 @@ router.post("/", async (req, res) => {
       price,
       amountInSol,
       networkFee,
-      senderWallet,
-      status,
+      userEmail,
       createdAt: new Date(),
     });
 
-    console.log("Inserted order:", result.insertedId);
+    // Update user stats
+    await users.updateOne(
+      { UserID: userEmail },
+      {
+        $inc: {
+          totalOrders: 1,
+          totalSpent: price,
+        },
+      }
+    );
 
-    // Check if senderWallet exists in web3users
-    const existingUser = await users.findOne({ senderWallet });
+    // Update stock quantity
+    await items.updateOne(
+      { name: item },
+      {
+        $inc: { stockQuantity: -1 },
+      }
+    );
 
-    if (!existingUser) {
-      console.log("No existing user. Creating new web3 user record...");
-
-      await users.insertOne({
-        senderWallet,
-        totalOrders: 0,
-        totalSpent: 0,
-        createdAt: new Date(),
-      });
-
-      console.log("New web3 user created.");
-    } else {
-      console.log("Existing user found. Updating stats...");
-
-      await users.updateOne(
-        { senderWallet },
-        {
-          $inc: {
-            totalOrders: 1,
-            totalSpent: price,
-          },
-        }
-      );
-
-      console.log("User stats updated.");
-    }
-
-    res.status(201).json({ message: "Order and user stats updated successfully" });
+    res.status(201).json({ message: "Order saved and user/item updated successfully" });
   } catch (err) {
     console.error("Error saving order:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
+ 
 
 export default router;
 
