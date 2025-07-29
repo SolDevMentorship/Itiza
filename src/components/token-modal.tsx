@@ -17,14 +17,6 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 import { PublicKey } from "@solana/web3.js"
 import { invokeGiftToken } from "@/utils/helpers"
 import tokenList from "@/utils/tokens.json"
-// import * as anchor from '@project-serum/anchor';
-
-
-
-// const connection = provider.connection;
-
-
-
 
 interface GiftTokenModalProps {
     isOpen: boolean
@@ -34,14 +26,7 @@ interface GiftTokenModalProps {
 const SOL_MINT = "So11111111111111111111111111111111111111112"
 
 export default function GiftTokenModal({ isOpen, onClose }: GiftTokenModalProps) {
-
-    // const provider = anchor.AnchorProvider.env();
-    // anchor.setProvider(provider);
-
-    // const connection = provider.connection;
     const { connection } = useConnection()
-
-
     const wallet = useWallet()
 
     const [giftAddress, setGiftAddress] = useState("")
