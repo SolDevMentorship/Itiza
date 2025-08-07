@@ -149,9 +149,7 @@ const AllGifts: React.FC = () => {
             item={{
               ...selectedGift,
               price: selectedGift?.price.toString(),
-              img: selectedGift?.image_url || '/images/gift-placeholder.png',
-              id: selectedGift.gift_id.toString(),
-              
+              image_url: selectedGift?.image_url || undefined
             }}
             isOpen={isModalOpen}
             onClose={() => {

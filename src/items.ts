@@ -1,9 +1,6 @@
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 9ffeb28e206ae830dc826a62c74be137362ed559
 // src/items.ts
 import express from "express";
 import { connectToMongo, getMongoClient } from "./mongoClient";
@@ -11,11 +8,7 @@ import { Buffer } from "buffer";
 
 const router = express.Router();
 
-<<<<<<< HEAD
-router.get("/", async (req, res) => {
-=======
 router.get("/", async (_req, res) => {
->>>>>>> 9ffeb28e206ae830dc826a62c74be137362ed559
   try {
     await connectToMongo();
     const client = getMongoClient();

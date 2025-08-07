@@ -197,10 +197,11 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
     }
   };
 
+  const userEmail = localStorage.getItem("userEmail");
 
   const saveOrder = async (signature: string, itemPriceUsd: number, amountInSol: number) => {
     try {
-      const userEmail = localStorage.getItem("userEmail");
+      
 
       const order = {
         id: item.id,
@@ -214,7 +215,9 @@ export function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
         price: itemPriceUsd,
         amountInSol,
         networkFee: estimatedFeeInSol,
+        senderWallet: publicKey?.toBase58(),
         userEmail: userEmail,
+        status: "pending",
       };
 
       const VITE_API_URL = import.meta.env.VITE_API_URL;

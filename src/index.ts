@@ -5,11 +5,11 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import ordersRouter from "./order";
-import itemsRouter from "./items";
 import { connectToMongo } from "./mongoClient";
 import authRouter from "./auth"; 
 import sendOtpRouter from "./sendOTP";
 import loginUser from "./loginUser";
+import itemsRouter from "./items";
 
 dotenv.config();
 

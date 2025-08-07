@@ -64,6 +64,7 @@ router.post("/", async (req, res) => {
       amountInSol,
       networkFee,
       userEmail,
+      senderWallet,
     } = req.body;
 
     if (!userEmail) {
@@ -89,6 +90,7 @@ router.post("/", async (req, res) => {
       amountInSol,
       networkFee,
       userEmail,
+      senderWallet,
       createdAt: new Date(),
     });
 
@@ -120,16 +122,6 @@ router.post("/", async (req, res) => {
  
 
 export default router;
-
-
-
-
-
-
-
-
-
-
 
 
 
