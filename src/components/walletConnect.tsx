@@ -10,6 +10,7 @@ import {
   WalletModalProvider,
   WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
+import { Connection } from "@solana/web3.js";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 
@@ -36,7 +37,7 @@ export const CustomWalletMultiButton = () => {
 
 // Button styles
 const connectButtonStyles: React.CSSProperties = {
-  backgroundColor: "#832c2c",
+  backgroundColor: "#832c2c", // Bootstrap 'primary' color
   color: "#fff",
   padding: "0.5rem 1rem",
   border: "2px solid antiquewhite",
@@ -49,16 +50,18 @@ const connectButtonStyles: React.CSSProperties = {
 const WalletContextProvider: React.FC<WalletContextProviderProps> = ({
   children,
 }) => {
-  // Set the network endpoint as a variable
-  const network = "https://api.devnet.solana.com"; // You can later swap this to Mainnet or Testnet
+  const network = new Connection(
+    "https://hidden-broken-yard.solana-mainnet.quiknode.pro/7fef0c379b4a84c33cf93ab6d9ada7a5916eba9b"
+  );
+  const endpoint =
+    "https://hidden-broken-yard.solana-mainnet.quiknode.pro/7fef0c379b4a84c33cf93ab6d9ada7a5916eba9b"; // useMemo(() => network, [network]);
 
-  // Memoize the wallet adapters, and depend on the network variable
   const wallets = useMemo(() => [new PhantomWalletAdapter()], [network]);
 
   const wallet = useSolanaWallet();
 
   return (
-    <ConnectionProvider endpoint={network}>
+    <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           <WalletContext.Provider value={wallet}>

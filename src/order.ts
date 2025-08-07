@@ -50,11 +50,7 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    console.log("Received POST /orders request");
-
     await connectToMongo();
-    console.log("Mongo connected in POST /orders");
-
     const {
       id,
       item,
@@ -67,16 +63,17 @@ router.post("/", async (req, res) => {
       price,
       amountInSol,
       networkFee,
+      senderWallet,
     } = req.body;
 
-    console.log("Request body:", req.body);
 
     const db = client.db("Itiza_Delivery");
-    const orders = db.collection("orders");
+    const orders = db.collection("web3orders");
+    const users = db.collection("web3users");
+    const items = db.collection("items");
 
-    console.log("Inserting order...");
-
-    const result = await orders.insertOne({
+    // Save the order
+    await orders.insertOne({
       id,
       item,
       recipientName,
@@ -88,17 +85,36 @@ router.post("/", async (req, res) => {
       price,
       amountInSol,
       networkFee,
+      senderWallet,
       createdAt: new Date(),
     });
 
-    console.log("Inserted order:", result.insertedId);
+    // Update user stats
+    await users.updateOne(
+      { senderWallet: senderWallet },
+      {
+        $inc: {
+          totalOrders: 1,
+          totalSpent: price,
+        },
+      }
+    );
 
-    res.status(201).json({ message: "Order saved successfully" });
+    // Update stock quantity
+    await items.updateOne(
+      { name: item },
+      {
+        $inc: { stockQuantity: -1 },
+      }
+    );
+
+    res.status(201).json({ message: "Order saved and user/item updated successfully" });
   } catch (err) {
     console.error("Error saving order:", err);
     res.status(500).json({ error: "Internal server error" });
   }
-}); 
+});
+ 
 
 export default router;
 
