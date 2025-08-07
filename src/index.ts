@@ -1,13 +1,11 @@
 
-
-
-
 // src/index.ts
 
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import ordersRouter from "./order";
+import itemsRouter from "./items";
 import { connectToMongo } from "./mongoClient";
 
 dotenv.config();
@@ -21,6 +19,7 @@ app.use(express.json());
 
 // Routes
 app.use("/Itiza_Delivery/orders", ordersRouter);
+app.use("/Itiza_Delivery/items", itemsRouter);
 
 // Start server
 app.listen(PORT, async () => {
@@ -33,7 +32,6 @@ app.listen(PORT, async () => {
     process.exit(1); // Exit process if Mongo connection failed
   }
 });
-
 
 
 
