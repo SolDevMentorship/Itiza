@@ -146,7 +146,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
 
         // read as text first (so we can log raw body if JSON parse fails)
-        const respText = await resp.text().catch((e) => {
+        const respText = await resp.text().catch((e: any) => {
           console.error(`[${now()}] paystack: failed to read response text:`, e);
           return null;
         });
@@ -221,7 +221,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         );
 
-        const respText = await resp.text().catch((e) => {
+        const respText = await resp.text().catch((e: any) => {
           console.error(`[${now()}] paystack.verify failed to read text:`, e);
           return null;
         });
