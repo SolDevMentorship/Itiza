@@ -1,117 +1,0 @@
-[33mcommit 2d2d76e3886c0da4d61541e000d0ceb5fecfdb37[m
-Author: don-munnex <muniradeiza01@gmail.com>
-Date:   Sun Sep 28 19:52:23 2025 +0100
-
-    first commit
-
-[1mdiff --git a/.env b/.env[m
-[1mdeleted file mode 100644[m
-[1mindex 47cb34b..0000000[m
-[1m--- a/.env[m
-[1m+++ /dev/null[m
-[36m@@ -1,46 +0,0 @@[m
-[31m-# Project root directory[m
-[31m-JWT_SECRET=3de15f86dade418abe8b0f55fc01949a4f0e22305c486123b7856b153f25daaeb0b8967e936fde79b2cb4bf3558f273bdb84abddf67fd523fd17b68fa370058a[m
-[31m-[m
-[31m-NODE_ENV=development[m
-[31m-[m
-[31m-SUPABASE_STORAGE_BUCKET=gifts[m
-[31m-[m
-[31m-SUPABASE_URL=https://mvkpxtlihhnairoxkllf.supabase.co[m
-[31m-[m
-[31m-SUPABASE_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12a3B4dGxpaGhuYWlyb3hrbGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MzE4NTAsImV4cCI6MjA3MzIwNzg1MH0.QWiKxFsjxuMYzJznijh1sC4Fi_pJcF62njY0BfvOpj8[m
-[31m-[m
-[31m-PORT=4000[m
-[31m-[m
-[31m-VITE_API_URL=http://localhost:4000[m
-[31m-[m
-[31m-GMAIL_USER=itiza.co@gmail.com [m
-[31m-GMAIL_APP_PASSWORD=tbzxcqabebxuogzp[m
-[31m-[m
-[31m-[m
-[31m-VITE_SOLANA_RPC_URL=https://quiet-indulgent-fire.solana-devnet.quiknode.pro/04bd270aef5de27cf8d9a0ca97778b63b1517a03/[m
-[31m-VITE_SOLANA_FALLBACK_RPC_URL=https://api.devnet.solana.com[m
-[31m-[m
-[31m-[m
-[31m-# server-only (do NOT prefix with VITE_)[m
-[31m-PAYSTACK_SECRET_KEY=sk_live_f0d7deeb2020e983f1ef7a04359ccb55eef1579f[m
-[31m-PAYSTACK_CALLBACK_URL=http://localhost:4000/Itiza_Delivery/dashboard[m
-[31m-PAYSTACK_ENV=test[m
-[31m-PAYSTACK_WEBHOOK_SECRET=http://localhost:4000/Itiza_Delivery/payments/paystack/webhook[m
-[31m-[m
-[31m-# client-visible (Vite)[m
-[31m-VITE_PAYSTACK_PUBLIC_KEY=pk_live_0cdad1fa155bd91dc684d435501577513262c0b7[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-[31m-[m
-
-[33mcommit 0dd53cf0b1e488aaa7c3e833ba4f4210cada3690[m[33m ([m[1;32mmaster[m[33m)[m
-Author: don-munnex <muniradeiza01@gmail.com>
-Date:   Sun Sep 28 19:28:12 2025 +0100
-
-    Initial backend code upload
-
-[1mdiff --git a/.env b/.env[m
-[1mnew file mode 100644[m
-[1mindex 0000000..47cb34b[m
-[1m--- /dev/null[m
-[1m+++ b/.env[m
-[36m@@ -0,0 +1,46 @@[m
-[32m+[m[32m# Project root directory[m[41m[m
-[32m+[m[32mJWT_SECRET=3de15f86dade418abe8b0f55fc01949a4f0e22305c486123b7856b153f25daaeb0b8967e936fde79b2cb4bf3558f273bdb84abddf67fd523fd17b68fa370058a[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32mNODE_ENV=development[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32mSUPABASE_STORAGE_BUCKET=gifts[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32mSUPABASE_URL=https://mvkpxtlihhnairoxkllf.supabase.co[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32mSUPABASE_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12a3B4dGxpaGhuYWlyb3hrbGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MzE4NTAsImV4cCI6MjA3MzIwNzg1MH0.QWiKxFsjxuMYzJznijh1sC4Fi_pJcF62njY0BfvOpj8[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32mPORT=4000[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32mVITE_API_URL=http://localhost:4000[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32mGMAIL_USER=itiza.co@gmail.com[m[41m [m
-[32m+[m[32mGMAIL_APP_PASSWORD=tbzxcqabebxuogzp[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32mVITE_SOLANA_RPC_URL=https://quiet-indulgent-fire.solana-devnet.quiknode.pro/04bd270aef5de27cf8d9a0ca97778b63b1517a03/[m[41m[m
-[32m+[m[32mVITE_SOLANA_FALLBACK_RPC_URL=https://api.devnet.solana.com[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32m# server-only (do NOT prefix with VITE_)[m[41m[m
-[32m+[m[32mPAYSTACK_SECRET_KEY=sk_live_f0d7deeb2020e983f1ef7a04359ccb55eef1579f[m[41m[m
-[32m+[m[32mPAYSTACK_CALLBACK_URL=http://localhost:4000/Itiza_Delivery/dashboard[m[41m[m
-[32m+[m[32mPAYSTACK_ENV=test[m[41m[m
-[32m+[m[32mPAYSTACK_WEBHOOK_SECRET=http://localhost:4000/Itiza_Delivery/payments/paystack/webhook[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32m# client-visible (Vite)[m[41m[m
-[32m+[m[32mVITE_PAYSTACK_PUBLIC_KEY=pk_live_0cdad1fa155bd91dc684d435501577513262c0b7[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
