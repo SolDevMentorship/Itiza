@@ -1,5 +1,5 @@
 // src/components/GiftModal.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import _React, { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -86,13 +86,13 @@ const RPC_ENDPOINTS: string[] = [
   import.meta.env.VITE_SOLANA_FALLBACK_RPC_URL,
 ];
 
-export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
+export default function GiftModalOld({ item, isOpen, onClose }: GiftModalProps) {
   const { publicKey, connected, signTransaction } = useWallet();
 
   // Persisted customer info (from /auth/me or localStorage)
   const [customerID, setCustomerID] = useState<string | null>(null);
   const [customerEmail, setCustomerEmail] = useState<string | null>(null);
-  const [customerPhone, setCustomerPhone] = useState<string | null>(null);
+  const [_customerPhone, setCustomerPhone] = useState<string | null>(null);
 
   // recipient & order fields
   const [selectedRelation, setSelectedRelation] = useState("");

@@ -20,7 +20,6 @@ export default function LandingHeader({
   isLoggedIn,
   setIsLoggedIn,
   setShowLoginModal,
-  setShowSignUpModal,
 }: LandingHeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

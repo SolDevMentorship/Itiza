@@ -1,6 +1,4 @@
 
-
-
 // src/pages/landing.tsx
 "use client";
 
