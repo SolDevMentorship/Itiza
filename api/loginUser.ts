@@ -173,14 +173,10 @@
 
 
 
-
-
-// src/api/login.ts
+// src/api/loginUser.ts
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-// NOTE: do NOT import getSupabase at module load time to avoid import-time throws.
-// import { getSupabase } from "./supabaseClient";
 
 /** Customer interface */
 export interface Customer {
@@ -216,25 +212,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  // If you don't set ALLOWED_ORIGINS, default to localhost for local dev only.
-  const defaultOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
-  const allowedOrigins = allowedOriginsEnv.length ? allowedOriginsEnv : defaultOrigins;
+  const allowedOrigins = allowedOriginsEnv;
 
   const origin = String(req.headers.origin || "");
   let allowOriginHeader = "";
 
-  if (allowedOrigins.includes("*")) {
-    allowOriginHeader = "*";
-  } else if (allowedOrigins.includes(origin)) {
+  // Check for wildcard OR specific origin
+  if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+    // Always use the specific origin when credentials are involved
     allowOriginHeader = origin;
   }
 
   if (allowOriginHeader) {
     res.setHeader("Access-Control-Allow-Origin", allowOriginHeader);
-    // only allow credentials when origin is explicit (not "*")
-    if (allowOriginHeader !== "*") {
-      res.setHeader("Access-Control-Allow-Credentials", "true");
-    }
+    res.setHeader("Access-Control-Allow-Credentials", "true");
   }
 
   // Tell caches that the response varies by Origin
@@ -252,12 +243,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  console.log("👀 Hit /login with body:", req.body);
+  console.log("👀 Hit /loginUser with body:", req.body);
 
   try {
-    const { customerID, password } = req.body ?? {};
+    const { customerID, password, identifier } = req.body ?? {};
 
-    if (!customerID || !password) {
+    // Use either customerID or identifier (fallback)
+    const userIdentifier = customerID || identifier;
+
+    if (!userIdentifier || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
@@ -275,8 +269,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: user, error } = await supabase
       .from("customers")
       .select("*")
-      .eq("customerID", String(customerID).toLowerCase().trim())
-      .maybeSingle(); // no <Customer> here
+      .eq("customerID", String(userIdentifier).toLowerCase().trim())
+      .maybeSingle();
 
     if (error) {
       console.error("❌ Supabase query error:", error);
