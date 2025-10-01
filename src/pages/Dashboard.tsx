@@ -332,8 +332,8 @@ export default function Dashboard(): JSX.Element {
       try {
         const limit = 6;
         // Vite env access via import.meta.env
-        const urlBase = `${(import.meta as any).env.VITE_API_URL}/Itiza_Delivery/gifts`;
-        const url = `${urlBase.replace(/\/$/, "")}?limit=${limit}`;
+        // const urlBase = `${(import.meta as any).env.VITE_API_URL}/Itiza_Delivery/gifts`;
+        const url = `https://itiza-backend.vercel.app/api/gifts`;
 
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
