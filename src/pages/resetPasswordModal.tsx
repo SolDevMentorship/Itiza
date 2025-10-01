@@ -84,6 +84,7 @@ const ResetPasswordModal: React.FC<Props> = ({ isOpen, onClose, prefillEmail = "
       const res = await fetch(`https://itiza-backend.vercel.app/api/sendOTP`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email: value, otp: otpToSend }),
       });
 

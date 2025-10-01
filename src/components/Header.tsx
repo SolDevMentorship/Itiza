@@ -11,7 +11,7 @@ interface HeaderProps {
     onOpenUnwrapModal: () => void
 }
 
-export const Header: React.FC<HeaderProps> = ({ hasPendingGift, onOpenUnwrapModal }) => {
+export const Header: React.FC<HeaderProps> = ({ hasPendingGift }) => {
     const navigate = useNavigate();
     const [isScrolled, setIsScrolled] = useState(false)
 
@@ -52,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({ hasPendingGift, onOpenUnwrapModa
 
           <div className="flex items-center gap-4">
               <div className="relative">
-                  <Bell className="h-6 w-6 text-pink-600 cursor-pointer" onClick={onOpenUnwrapModal} />
+                  <Bell className="h-6 w-6 text-pink-600 cursor-pointer" onClick={() => navigate("/Notification")} />
                   {hasPendingGift && (
                       <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center bg-red-500">
                           <span className="sr-only">Notification</span>

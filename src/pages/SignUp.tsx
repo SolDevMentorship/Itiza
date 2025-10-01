@@ -43,6 +43,7 @@ const SignUpModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToLogin }) => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ email, otp }),
       });
 
@@ -80,6 +81,7 @@ const SignUpModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToLogin }) => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           fullName,
           email,
