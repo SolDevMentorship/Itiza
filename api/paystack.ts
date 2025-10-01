@@ -343,47 +343,66 @@ function now() {
   return new Date().toISOString();
 }
 
+/**
+ * Set CORS headers - MUST be called before any response
+ */
+function setCorsHeaders(req: VercelRequest, res: VercelResponse): void {
+  try {
+    const allowedOriginsEnv = (process.env.ALLOWED_ORIGINS || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const origin = String(req.headers.origin || "");
+    let allowOriginHeader = "";
+
+    // Check for wildcard OR specific origin
+    if (allowedOriginsEnv.includes("*") || allowedOriginsEnv.includes(origin)) {
+      allowOriginHeader = origin;
+    }
+
+    // Debug logging
+    console.log(`[${now()}] CORS Debug:`, {
+      origin,
+      allowedOriginsEnv,
+      allowOriginHeader,
+      envRaw: process.env.ALLOWED_ORIGINS,
+    });
+
+    if (allowOriginHeader) {
+      res.setHeader("Access-Control-Allow-Origin", allowOriginHeader);
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Max-Age", "86400");
+  } catch (err) {
+    console.error(`[${now()}] CORS setup error:`, err);
+    // Fallback: set permissive CORS on error
+    res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // ---- CORS handling ----
-  const allowedOriginsEnv = (process.env.ALLOWED_ORIGINS || "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  // CRITICAL: Set CORS headers FIRST, before any logic
+  setCorsHeaders(req, res);
 
-  const allowedOrigins = allowedOriginsEnv;
-
-  const origin = String(req.headers.origin || "");
-  let allowOriginHeader = "";
-
-  // Check for wildcard OR specific origin
-  if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
-    // Always use the specific origin when credentials are involved
-    allowOriginHeader = origin;
-  }
-
-  if (allowOriginHeader) {
-    res.setHeader("Access-Control-Allow-Origin", allowOriginHeader);
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-  }
-
-  res.setHeader("Vary", "Origin");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Max-Age", "86400");
-
-  // Handle preflight
+  // Handle preflight immediately
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
 
-  // --- logging middleware equivalent (kept same info as original) ---
+  // Logging
   try {
     console.log(`[${now()}] paystack: incoming ${req.method} ${req.url}`);
     console.log(`[${now()}] paystack: headers:`, {
       origin: req.headers.origin,
       host: req.headers.host,
       "content-type": req.headers["content-type"],
-      // do NOT print authorization headers from client (if any)
     });
     if (req.body && Object.keys(req.body).length) {
       try {
@@ -393,16 +412,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
   } catch (e) {
-    // never throw from logging
     console.warn(`[${now()}] paystack: logging failed`, e);
   }
 
-  // Determine route by pathname — Vercel function will typically be mounted at /api/paystack
+  // Determine route by pathname
   const host = req.headers.host ?? "localhost";
   const fullUrl = new URL(req.url ?? "/", `https://${host}`);
-  const pathname = fullUrl.pathname; // e.g. /api/paystack/initialize
+  const pathname = fullUrl.pathname;
 
-  // Simple helper to check paths (supports both /api/paystack/initialize and /initialize)
   const pathEndsWith = (p: string) =>
     pathname.endsWith(p) || pathname.endsWith(`${p}/`) || pathname === p;
 
@@ -411,11 +428,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // POST /initialize
     // --------------------------
     if (req.method === "POST" && pathEndsWith("/initialize")) {
-      console.log("initialize router successfully hit");
+      console.log(`[${now()}] initialize router hit`);
 
       const start = Date.now();
       try {
-        const { amount, email, currency = "USD", fullName, metadata } = req.body ?? {};
+        const { amount, email, currency = "NGN", fullName, metadata } = req.body ?? {};
         console.log(
           `[${now()}] paystack.initialize called -> amount=${amount} email=${email} currency=${currency}`
         );
@@ -429,11 +446,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const amountSubunits = Math.round(Number(amount) * 100);
 
-        // Masked env debug
         console.log(`[${now()}] paystack: PAYSTACK_BASE=${PAYSTACK_BASE}`);
         console.log(
           `[${now()}] paystack: PAYSTACK_SECRET_KEY ${PAYSTACK_SECRET ? "(present)" : "(missing)"}`
         );
+
         if (!PAYSTACK_SECRET) {
           console.warn(
             `[${now()}] PAYSTACK_SECRET_KEY not set — returning mocked initialize response`
@@ -475,7 +492,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           body: JSON.stringify(payload),
         });
 
-        // read as text first (so we can log raw body if JSON parse fails)
         const respText = await resp.text().catch((e: any) => {
           console.error(`[${now()}] paystack: failed to read response text:`, e);
           return null;
@@ -486,7 +502,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           if (respText) json = JSON.parse(respText);
         } catch (e) {
           console.warn(
-            `[${now()}] paystack: response is not JSON (raw text below). parse error:`,
+            `[${now()}] paystack: response is not JSON. parse error:`,
             e
           );
         }
@@ -498,7 +514,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         );
 
         if (!resp.ok) {
-          // expose useful debug to caller
           return res.status(resp.status).json({
             success: false,
             error: "Paystack initialize failed",
@@ -551,7 +566,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         );
 
-        const respText = await resp.text().catch((e:any) => {
+        const respText = await resp.text().catch((e: any) => {
           console.error(`[${now()}] paystack.verify failed to read text:`, e);
           return null;
         });
@@ -609,7 +624,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // GET /test
     // --------------------------
     if (req.method === "GET" && pathEndsWith("/test")) {
-      console.log("Paystack test route hit!");
+      console.log(`[${now()}] Paystack test route hit!`);
       return res.json({
         message: "Paystack router is working!",
         timestamp: new Date().toISOString(),
@@ -618,7 +633,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // If no route matched:
+    // No route matched
     return res.status(404).json({ success: false, error: "Not found" });
   } catch (err: any) {
     console.error(`[${now()}] paystack.handler thrown:`, err);
