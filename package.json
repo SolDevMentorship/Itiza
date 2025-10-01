@@ -3,7 +3,9 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/dotenv": "^8.2.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^17.0.42",
     "@types/nodemailer": "^6.4.17",
     "@vercel/node": "^2.15.10",
@@ -14,6 +16,8 @@
     "start": "vercel dev"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.4"
+    "@supabase/supabase-js": "^2.57.4",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2"
   }
 }

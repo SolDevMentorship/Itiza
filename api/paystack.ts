@@ -221,7 +221,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         );
 
-        const respText = await resp.text().catch((e: any) => {
+        const respText = await resp.text().catch((e:any) => {
           console.error(`[${now()}] paystack.verify failed to read text:`, e);
           return null;
         });
