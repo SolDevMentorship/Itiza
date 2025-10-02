@@ -1,5 +1,4 @@
 
-
 // src/components/modals/LoginModal.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { Dialog } from "@headlessui/react";
