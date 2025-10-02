@@ -7,6 +7,7 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1.ts" }
+    { "src": "/api/paystack/(.*)", "dest": "/api/paystack" },
+    { "src": "/api/(.*)", "dest": "/api/$1" }
   ]
 }
