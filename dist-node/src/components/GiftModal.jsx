@@ -311,6 +311,7 @@ export default function GiftModalOld({ item, isOpen, onClose }) {
             const resp = await fetch(`https://itiza-backend.vercel.app/api/order`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify(payload),
             });
             if (!resp.ok) {
@@ -555,6 +556,7 @@ export default function GiftModalOld({ item, isOpen, onClose }) {
             const initResp = await fetch(`https://itiza-backend.vercel.app/api/paystack/initialize`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify(initBody),
             });
             // parse JSON robustly
@@ -606,7 +608,9 @@ export default function GiftModalOld({ item, isOpen, onClose }) {
                 // wait
                 await new Promise((r) => setTimeout(r, pollIntervalMs));
                 try {
-                    const vResp = await fetch(`${verifyUrlBase}?reference=${encodeURIComponent(reference)}`);
+                    const vResp = await fetch(`${verifyUrlBase}?reference=${encodeURIComponent(reference)}`, {
+                        credentials: "include", // ADD THIS
+                    });
                     let vJson = null;
                     try {
                         vJson = await vResp.json();

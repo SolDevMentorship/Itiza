@@ -30,6 +30,7 @@ const SignUpModal = ({ isOpen, onClose, onSwitchToLogin }) => {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify({ email, otp }),
             });
             console.log("📥 Response status:", res.status);
@@ -61,6 +62,7 @@ const SignUpModal = ({ isOpen, onClose, onSwitchToLogin }) => {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify({
                     fullName,
                     email,

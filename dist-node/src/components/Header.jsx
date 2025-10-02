@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { CustomWalletMultiButton } from "./walletConnect";
-export const Header = ({ hasPendingGift, onOpenUnwrapModal }) => {
+export const Header = ({ hasPendingGift }) => {
     const navigate = useNavigate();
     const [isScrolled, setIsScrolled] = useState(false);
     useEffect(() => {
@@ -35,7 +35,7 @@ export const Header = ({ hasPendingGift, onOpenUnwrapModal }) => {
 
           <div className="flex items-center gap-4">
               <div className="relative">
-                  <Bell className="h-6 w-6 text-pink-600 cursor-pointer" onClick={onOpenUnwrapModal}/>
+                  <Bell className="h-6 w-6 text-pink-600 cursor-pointer" onClick={() => navigate("/Notification")}/>
                   {hasPendingGift && (<Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center bg-red-500">
                           <span className="sr-only">Notification</span>
                       </Badge>)}

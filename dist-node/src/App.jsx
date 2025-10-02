@@ -7,6 +7,7 @@ import { Layout } from "./components/Layout";
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import OldDashboard from "./pages/OldDashboard";
+import { Notification } from "./pages/Notification";
 function App() {
     return (<WalletContextProvider>
       <Router>
@@ -16,6 +17,7 @@ function App() {
             <Route path="/old" element={<Home />}/>
             <Route path="/dashboard" element={<Layout> <Dashboard /> </Layout>}/>
             <Route path="/categories" element={<Categories />}/>
+            <Route path="/Notification" element={<Notification />}/>
         </Routes>
       </Router>
     </WalletContextProvider>);
