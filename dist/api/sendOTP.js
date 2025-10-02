@@ -1,4 +1,8 @@
 "use strict";
+// // src/api/sendOTP.ts
+// import { VercelRequest, VercelResponse } from "@vercel/node";
+// import nodemailer from "nodemailer";
+// import dotenv from "dotenv";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -19,39 +23,52 @@ transporter
     .verify()
     .then(() => console.log("[sendOTP] Nodemailer transporter ready"))
     .catch((err) => console.warn("[sendOTP] Nodemailer transporter verification failed:", err?.message ?? err));
-/** Helper to compute allowed origin header from ALLOWED_ORIGINS env */
-function computeAllowOrigin(originHeader) {
-    const allowedOrigins = (process.env.ALLOWED_ORIGINS || "*")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-    const origin = String(originHeader || "");
-    if (allowedOrigins.includes(origin))
-        return origin;
-    if (allowedOrigins.includes("*"))
-        return "*";
-    return "";
+/**
+ * Set CORS headers - MUST be called before any response
+ */
+function setCorsHeaders(req, res) {
+    try {
+        const allowedOriginsEnv = (process.env.ALLOWED_ORIGINS || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+        const origin = String(req.headers.origin || "");
+        let allowOriginHeader = "";
+        // Check for wildcard OR specific origin
+        if (allowedOriginsEnv.includes("*") || allowedOriginsEnv.includes(origin)) {
+            allowOriginHeader = origin;
+        }
+        // Debug logging
+        console.log("[sendOTP] CORS Debug:", {
+            origin,
+            allowedOriginsEnv,
+            allowOriginHeader,
+            envRaw: process.env.ALLOWED_ORIGINS,
+        });
+        if (allowOriginHeader) {
+            res.setHeader("Access-Control-Allow-Origin", allowOriginHeader);
+            res.setHeader("Access-Control-Allow-Credentials", "true");
+        }
+        res.setHeader("Vary", "Origin");
+        res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        res.setHeader("Access-Control-Max-Age", "86400");
+    }
+    catch (err) {
+        console.error("[sendOTP] CORS setup error:", err);
+        // Fallback: set permissive CORS on error
+        res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+        res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    }
 }
 /**
  * Vercel Node handler for POST /sendOTP
- * - Uses Vercel types for req/res
- * - Adds CORS headers and preflight handling
- * - Keeps nodemailer usage and email format unchanged
  */
 async function handler(req, res) {
-    // CORS headers
-    const allowOriginHeader = computeAllowOrigin(req.headers.origin);
-    if (allowOriginHeader) {
-        res.setHeader("Access-Control-Allow-Origin", allowOriginHeader);
-        if (allowOriginHeader !== "*") {
-            // allow credentials when a specific origin is set
-            res.setHeader("Access-Control-Allow-Credentials", "true");
-        }
-    }
-    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.setHeader("Access-Control-Max-Age", "86400");
-    // Preflight
+    // CRITICAL: Set CORS headers FIRST
+    setCorsHeaders(req, res);
+    // Handle preflight immediately
     if (req.method === "OPTIONS") {
         return res.status(204).end();
     }

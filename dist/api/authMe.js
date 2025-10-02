@@ -1,4 +1,8 @@
 "use strict";
+// // src/api/authMe.ts
+// import { VercelRequest, VercelResponse } from "@vercel/node";
+// import jwt from "jsonwebtoken";
+// import { getSupabase } from "./supabaseClient";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,26 +13,29 @@ const supabaseClient_1 = require("./supabaseClient");
  * Vercel Node handler for GET /auth/me
  * - Uses Vercel types for req/res
  * - Adds CORS headers and preflight handling
- *
- * NOTE: Database calls and logic are left exactly as in your original module.
  */
 async function handler(req, res) {
-    // Basic CORS - allow origins via env or fallback to wildcard
-    const allowedOrigins = (process.env.ALLOWED_ORIGINS || "*")
+    // ---- CORS handling ----
+    const allowedOriginsEnv = (process.env.ALLOWED_ORIGINS || "")
         .split(",")
-        .map((s) => s.trim());
+        .map((s) => s.trim())
+        .filter(Boolean);
+    const allowedOrigins = allowedOriginsEnv;
     const origin = String(req.headers.origin || "");
-    const allowOriginHeader = allowedOrigins.includes(origin)
-        ? origin
-        : allowedOrigins.includes("*")
-            ? "*"
-            : "";
+    let allowOriginHeader = "";
+    // Check for wildcard OR specific origin
+    if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+        // Always use the specific origin when credentials are involved
+        allowOriginHeader = origin;
+    }
     if (allowOriginHeader) {
         res.setHeader("Access-Control-Allow-Origin", allowOriginHeader);
+        res.setHeader("Access-Control-Allow-Credentials", "true");
     }
+    res.setHeader("Vary", "Origin");
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.setHeader("Access-Control-Max-Age", "86400"); // cache preflight for 1 day
+    res.setHeader("Access-Control-Max-Age", "86400");
     // Handle preflight
     if (req.method === "OPTIONS") {
         return res.status(204).end();
