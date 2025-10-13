@@ -1490,7 +1490,7 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
     try {
       console.log("[orders] saving payload:", payload);
 
-      const VITE_API_URL = (import.meta.env.VITE_API_URL as string) || "https://itiza-backend.vercel.app";
+      const VITE_API_URL = "https://itiza-backend.vercel.app";
       const resp = await fetch(`${VITE_API_URL.replace(/\/$/, "")}/api/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1748,8 +1748,8 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
     setLoading(true);
 
     // Build API base
-    const VITE_API_URL = (import.meta.env.VITE_API_URL as string) || "https://itiza-backend.vercel.app";
-    const apiBase = VITE_API_URL.replace(/\/$/, "");
+    // const VITE_API_URL = "https://itiza-backend.vercel.app";
+    const apiBase = "https://itiza-backend.vercel.app";
 
     // Open popup synchronously to avoid blockers
     const popup = window.open("", "_blank", "noopener,noreferrer");
