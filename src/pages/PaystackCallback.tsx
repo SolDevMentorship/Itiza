@@ -39,7 +39,7 @@ export default function PaystackCallback() {
           return;
         }
 
-        const verifyUrl = `${apiBase}/api/paystack/verify?reference=${encodeURIComponent(ref)}`;
+        const verifyUrl = `https://itiza-backend.vercel.app/api/paystack/verify?reference=${encodeURIComponent(ref)}`;
         const resp = await fetch(verifyUrl, {
           credentials: "include",
         });

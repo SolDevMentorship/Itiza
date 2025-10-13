@@ -5,7 +5,7 @@ interface SignUpModalProps {
   onSwitchToLogin: () => void;
 }
 
-export function SignUpModal({ onClose, onSwitchToLogin }: SignUpModalProps) {
+export default function SignUpModal({ onClose, onSwitchToLogin }: SignUpModalProps) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [confirmEmail, setConfirmEmail] = useState("");
