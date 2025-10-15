@@ -1725,7 +1725,7 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
         gift: item.name,
         status: "pending",
         recipientPhone: recipientPhone,
-        senderWallet: publicKey?.toBase58() ?? null,
+        senderWallet: publicKey?.toBase58() ?? "", // ensure string not null
       };
 
       await saveOrderToBackend(orderPayload);
@@ -1812,7 +1812,7 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
       gift: item.name,
       status: "pending",
       recipientPhone: recipientPhone,
-      senderWallet: null,
+      senderWallet: publicKey?.toBase58() ?? "", // changed to empty string if wallet not present
     };
     try {
       localStorage.setItem("itiza_paystack_order_draft", JSON.stringify(draftForCallback));
@@ -2031,7 +2031,7 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
         gift: item.name,
         status: "pending",
         recipientPhone: recipientPhone,
-        senderWallet: null,
+        senderWallet: publicKey?.toBase58() ?? "", // ensure string not null for DB
       };
 
       console.debug("[orders] saving payload:", orderPayload);
