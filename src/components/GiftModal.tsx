@@ -1104,6 +1104,48 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // src/components/GiftModal.tsx
 import _React, { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
@@ -1490,7 +1532,7 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
     try {
       console.log("[orders] saving payload:", payload);
 
-      const VITE_API_URL = "https://itiza-backend.vercel.app";
+      const VITE_API_URL = (import.meta.env.VITE_API_URL as string) || "https://itiza-backend.vercel.app";
       const resp = await fetch(`${VITE_API_URL.replace(/\/$/, "")}/api/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1748,8 +1790,35 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
     setLoading(true);
 
     // Build API base
-    // const VITE_API_URL = "https://itiza-backend.vercel.app";
-    const apiBase = "https://itiza-backend.vercel.app";
+    const VITE_API_URL = (import.meta.env.VITE_API_URL as string) || "https://itiza-backend.vercel.app";
+    const apiBase = VITE_API_URL.replace(/\/$/, "");
+
+    // --- Persist a draft order to localStorage BEFORE initialize (fallback for redirect callback)
+    const draftForCallback: Partial<OrderPayload> = {
+      trackingID: null,
+      customerID: getCustomerIDFromStorage(),
+      merchantID: item.merchantID ?? null,
+      giftID: resolvedGiftID,
+      paymentMethod: "paystack_card",
+      amount: computedAmount,
+      networkFee,
+      recipientName,
+      recipientStreet,
+      recipientCity,
+      recipientState,
+      recipientCountry,
+      giftMessage,
+      quantity,
+      gift: item.name,
+      status: "pending",
+      recipientPhone: recipientPhone,
+      senderWallet: null,
+    };
+    try {
+      localStorage.setItem("itiza_paystack_order_draft", JSON.stringify(draftForCallback));
+    } catch (e) {
+      console.warn("Failed to persist paystack draft:", e);
+    }
 
     // Open popup synchronously to avoid blockers
     const popup = window.open("", "_blank", "noopener,noreferrer");
@@ -1779,12 +1848,20 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
         email,
         fullName: cardName || undefined,
         metadata: {
+          customerID: getCustomerIDFromStorage(),
           giftID: resolvedGiftID,
           merchantID: item.merchantID ?? null,
           recipientName,
+          recipientPhone,
+          recipientStreet,
+          recipientCity,
+          recipientState,
+          recipientCountry,
+          quantity,
           originalAmount: totalPayable,
+          networkFee,
           originalCurrency: "USD",
-          exchangeRate: ngnAmount / (totalPayable || 1),
+          gift: item.name,
         },
       };
 
@@ -1830,8 +1907,17 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
         throw new Error("Paystack initialization did not return authorization_url/reference");
       }
 
-      // store pending reference so the redirect/callback page can pick it up if needed
-      try { localStorage.setItem("paystack_pending_reference", reference); } catch {}
+      // update stored draft with reference so callback can find it
+      try {
+        const raw = localStorage.getItem("itiza_paystack_order_draft");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          parsed.trackingID = reference;
+          localStorage.setItem("itiza_paystack_order_draft", JSON.stringify(parsed));
+        }
+      } catch (e) {
+        console.warn("Failed to update paystack draft with reference:", e);
+      }
 
       // navigate popup (preferred) or full redirect if blocked
       if (popup && !popup.closed) {
@@ -1924,7 +2010,7 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
         return;
       }
 
-      // Verified success -> store order
+      // Verified success -> store order (best-effort; webhook is the reliable source-of-truth)
       console.debug("[paystack] payment verified, saving order with reference:", reference);
 
       const orderPayload: OrderPayload = {
@@ -1949,12 +2035,17 @@ export default function GiftModal({ item, isOpen, onClose }: GiftModalProps) {
       };
 
       console.debug("[orders] saving payload:", orderPayload);
-      await saveOrderToBackend(orderPayload);
+      try {
+        await saveOrderToBackend(orderPayload);
+      } catch (err) {
+        // If client-side save fails, don't treat as fatal — webhook should still save it server-side.
+        console.warn("[paystack] client-side order save failed; webhook should handle persistence. Error:", err);
+      }
 
       // success UX
       setShowCardModal(false);
       setShowPaymentChoice(false);
-      alert("Card payment successful — order saved.");
+      alert("Card payment successful — order saved (or will be saved shortly).");
       handleClose();
     } catch (err: any) {
       console.error("[paystack] card flow error:", err);
