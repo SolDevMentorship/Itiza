@@ -1,8 +1,4 @@
 "use strict";
-// // src/api/authMe.ts
-// import { VercelRequest, VercelResponse } from "@vercel/node";
-// import jwt from "jsonwebtoken";
-// import { getSupabase } from "./supabaseClient";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };

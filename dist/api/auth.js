@@ -9,24 +9,46 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
  * Vercel Node handler for POST /signup
  * - Uses Vercel types for req/res
  * - Adds CORS headers and preflight handling
- *
- * NOTE: Database connection and all existing logic are unchanged.
  */
 async function handler(req, res) {
-    // Basic CORS - allow origins via env or fallback to wildcard
-    const allowedOrigins = (process.env.ALLOWED_ORIGINS || "*")
+    // Allowed origins from env, comma-separated. Example:
+    // ALLOWED_ORIGINS=https://itizafrontend.vercel.app,https://localhost:5173
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
         .split(",")
-        .map((s) => s.trim());
+        .map((s) => s.trim())
+        .filter(Boolean);
     const origin = String(req.headers.origin || "");
-    const allowOriginHeader = allowedOrigins.includes(origin) ? origin : allowedOrigins.includes("*") ? "*" : "";
+    // Determine what to send as Access-Control-Allow-Origin.
+    // If the request has an Origin header and that origin is explicitly allowed (or '*' is configured),
+    // we echo back the request origin. We never return '*' if an Origin is present and credentials are expected.
+    let allowOriginHeader = "";
+    if (origin) {
+        if (allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
+            // echo back the origin (this is required when credentials are included)
+            allowOriginHeader = origin;
+        }
+    }
+    else if (allowedOrigins.includes("*")) {
+        // No Origin header present (e.g., some server-to-server calls) — allow wildcard
+        allowOriginHeader = "*";
+    }
     if (allowOriginHeader) {
         res.setHeader("Access-Control-Allow-Origin", allowOriginHeader);
+        // When we echo the origin (i.e. not "*"), we can allow credentials.
+        // Do NOT set Allow-Credentials:true when Access-Control-Allow-Origin is "*"
+        if (allowOriginHeader !== "*") {
+            res.setHeader("Access-Control-Allow-Credentials", "true");
+        }
+        // Tell caches that the response varies by Origin value
+        res.setHeader("Vary", "Origin");
     }
+    // Standard CORS preflight headers
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
     res.setHeader("Access-Control-Max-Age", "86400"); // cache preflight for 1 day
-    // Handle preflight
+    // Preflight response
     if (req.method === "OPTIONS") {
+        // Return 204 with the CORS headers above
         return res.status(204).end();
     }
     if (req.method !== "POST") {

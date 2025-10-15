@@ -1,8 +1,4 @@
 "use strict";
-// // src/api/sendOTP.ts
-// import { VercelRequest, VercelResponse } from "@vercel/node";
-// import nodemailer from "nodemailer";
-// import dotenv from "dotenv";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
