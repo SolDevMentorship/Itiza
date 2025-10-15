@@ -1,8 +1,7 @@
-import React from "react";
-interface Props {
-    isOpen: boolean;
+interface SignUpModalProps {
+    isOpen?: boolean;
     onClose: () => void;
     onSwitchToLogin: () => void;
 }
-declare const SignUpModal: React.FC<Props>;
-export default SignUpModal;
+export default function SignUpModal({ isOpen, onClose, onSwitchToLogin }: SignUpModalProps): import("react").JSX.Element | null;
+export {};

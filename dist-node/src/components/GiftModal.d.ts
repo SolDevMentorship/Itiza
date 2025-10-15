@@ -14,4 +14,4 @@ export interface GiftModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
-export default function GiftModalOld({ item, isOpen, onClose }: GiftModalProps): _React.JSX.Element | null;
+export default function GiftModal({ item, isOpen, onClose }: GiftModalProps): _React.JSX.Element | null;

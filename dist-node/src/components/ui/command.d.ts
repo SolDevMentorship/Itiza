@@ -48,7 +48,7 @@ declare const CommandGroup: React.ForwardRefExoticComponent<Omit<{
     ref?: React.Ref<HTMLDivElement>;
 } & {
     asChild?: boolean;
-}, "key" | "asChild" | keyof React.HTMLAttributes<HTMLDivElement>>, "value" | "heading"> & {
+}, "key" | "asChild" | keyof React.HTMLAttributes<HTMLDivElement>>, "heading" | "value"> & {
     heading?: React.ReactNode;
     value?: string;
     forceMount?: boolean;
@@ -66,7 +66,7 @@ declare const CommandItem: React.ForwardRefExoticComponent<Omit<{
     ref?: React.Ref<HTMLDivElement>;
 } & {
     asChild?: boolean;
-}, "key" | "asChild" | keyof React.HTMLAttributes<HTMLDivElement>>, "onSelect" | "disabled" | "value"> & {
+}, "key" | "asChild" | keyof React.HTMLAttributes<HTMLDivElement>>, "disabled" | "onSelect" | "value"> & {
     disabled?: boolean;
     onSelect?: (value: string) => void;
     value?: string;
